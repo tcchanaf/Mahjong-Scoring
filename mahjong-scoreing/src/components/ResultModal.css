@@ -1,0 +1,68 @@
+.main-page {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .selected-tiles {
+    margin-top: 20px;
+  }
+  
+  .calculate-score {
+    margin-top: 20px;
+  }
+  
+  .calculate-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .calculate-button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Modal Styling */
+  .MuiModal-root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+    max-width: 90%;
+  }
+  
+  .modal-box h2 {
+    margin-bottom: 20px;
+  }
+  
+  .modal-box p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .modal-box button {
+    background-color: #00796b;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .modal-box button:hover {
+    background-color: #004d40;
+  }
+  
