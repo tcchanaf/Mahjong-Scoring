@@ -5,13 +5,14 @@ import DisplayRow from './DisplayRow';
 import ResultBoard from './ResultBoard';
 import './MainPage.css';
 import './ResultModal.css';
+import { calculateScore } from '../utils/scoring';
 
 const tiles = {
-    tungzi: ['1筒', '2筒', '3筒', '4筒', '5筒', '6筒', '7筒', '8筒', '9筒'],
-    sokzi: ['1條', '2條', '3條', '4條', '5條', '6條', '7條', '8條', '9條'],
-    maanzi: ['1萬', '2萬', '3萬', '4萬', '5萬', '6萬', '7萬', '8萬', '9萬'],
-    faanzi: ['東風', '南風', '西風', '北風', '白龍', '發財', '中發'],
-    faa: ['春', '夏', '秋', '冬'],
+  tungzi: [101, 102, 103, 104, 105, 106, 107, 108, 109],
+  sokzi: [111, 112, 113, 114, 115, 116, 117, 118, 119],
+  maanzi: [121, 122, 123, 124, 125, 126, 127, 128, 129],
+  faanzi: [1, 2, 3, 4, 5, 6, 7],
+  faa: [11, 12, 13, 14]
 };
 
 const MainPage = () => {
@@ -45,8 +46,7 @@ const MainPage = () => {
 
   // Handle opening the modal and calculating the score
   const handleCalculateScore = () => {
-    const totalTiles = openHand.length + closedHand.length;
-    const calculatedScore = totalTiles * 10;
+    const calculatedScore = calculateScore(openHand, closedHand);
     setScore(calculatedScore);
     setModalOpen(true);
   };
@@ -89,7 +89,6 @@ const MainPage = () => {
 
       <div className="closed-hand">
         <h2>暗牌:</h2>
-
         <div className="tile-row">
             <DisplayRow
                 tiles={closedHand}

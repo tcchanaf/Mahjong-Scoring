@@ -1,3 +1,4 @@
+import { tileMapping } from '../utils/scoring';
 import React from 'react';
 
 const DisplayRow = ({ tiles, handleTileClick }) => {
@@ -10,7 +11,7 @@ const DisplayRow = ({ tiles, handleTileClick }) => {
             className="tile"
             onClick={() => handleTileClick(tile)} 
           >
-            {tile}
+            {tileMapping[tile]}
           </div>
         ))}
       </div>
