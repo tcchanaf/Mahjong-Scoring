@@ -1,9 +1,10 @@
 export const tileMapping = {
     101: '1筒', 102: '2筒', 103: '3筒', 104: '4筒', 105: '5筒', 106: '6筒', 107: '7筒', 108: '8筒', 109: '9筒',
-    111: '1條', 112: '2條', 113: '3條', 114: '4條', 115: '5條', 116: '6條', 117: '7條', 118: '8條', 119: '9條',
-    121: '1萬', 122: '2萬', 123: '3萬', 124: '4萬', 125: '5萬', 126: '6萬', 127: '7萬', 128: '8萬', 129: '9萬',
-    1: '東風', 2: '南風', 3: '西風', 4: '北風', 5: '白龍', 6: '發財', 7: '中發',
-    11: '春', 12: '夏', 13: '秋', 14: '冬',
+    201: '1條', 202: '2條', 203: '3條', 204: '4條', 205: '5條', 206: '6條', 207: '7條', 208: '8條', 209: '9條',
+    301: '1萬', 302: '2萬', 303: '3萬', 304: '4萬', 305: '5萬', 306: '6萬', 307: '7萬', 308: '8萬', 309: '9萬',
+    1: '東風', 3: '南風', 5: '西風', 7: '北風',
+    11: '白龍', 13: '發財', 15: '中發',
+    21: '春', 23: '夏', 25: '秋', 27: '冬',
 };
 
 export function calculateScore(openHand, closedHand) {
@@ -11,59 +12,199 @@ export function calculateScore(openHand, closedHand) {
 
     // Combine open and closed hands for total hand evaluation
     const fullHand = [...openHand, ...closedHand];
+    fullHand.sort((a, b) => a - b);
 
-    if (!isWin(fullHand)) {
-        return 0
-    }
-
-    // Basic winning hand
+    const fullHandCount = getHandCount(fullHand);
+    const closedHandCount = getHandCount(closedHand);
+    const openHandCount = getHandCount(openHand);
     fanCount += 5;
 
-    // Check for various hand types
-    if (isAllPungs(fullHand, openHand)) fanCount += 3; // 對對和
-    if (isSevenPairsWithPair(closedHand)) fanCount += 40; // 七對 (加一對)
-    if (isPureStraight(fullHand)) fanCount += 70; // 清一色
+    if (isHongKongThirteenOrphans(closedHandCount)) fanCount += 100; // 十三么
+    else if (is16NotMatch(closedHandCount)) fanCount += 40; // 十六不搭
+    else if (isSevenPairs(closedHandCount)) fanCount += 40; // 嚦咕嚦咕
+    else if (!isWin(fullHandCount)) {
+        return 0;
+    }
+
+    if (isPureStraight(fullHand)) fanCount += 80; // 清一色
+    else if (isMixedStraight(fullHand)) fanCount += 30; // 混一色
+
+    if (isAllTriplets(fullHandCount)) fanCount += 30; // 對對糊
+
     if (isAllHonors(fullHand)) fanCount += 10; // 字一色
+    if (isJuniorThreeChiefs(fullHandCount)) fanCount += 30; // 小三元
+    if (isGrandThreeChiefs(fullHandCount)) fanCount += 30; // 大三元
+    
+
     if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
-    if (isHongKongThirteenOrphans(closedHand)) fanCount += 1000; // 十三么
-    if (is16NotMatch(closedHand)) fanCount += 10000; // 十六不搭
+
     
     // Add more scoring rules here
 
     return fanCount;
 }
 
-function isWin(fullHand) {
-    if (fullHand.length !== 17) {
+
+export function isJuniorThreeChiefs(fullHandCount) {// 小三元	
+    const dragonTiles = [11, 13, 15]; //中, 發, 白
+    
+    let tripletCount = 0;
+    let pairCount = 0;
+
+    dragonTiles.forEach(tile => {
+        if (fullHandCount[tile] === 3) {
+            tripletCount++;
+        } else if (fullHandCount[tile] === 2) {
+            pairCount++;
+        }
+    });
+
+    return tripletCount === 2 && pairCount === 1;
+}
+
+export function isGrandThreeChiefs(fullHandCount) {// 大三元	
+    const requiredTiles = {
+        11: 3, 13: 3, 15: 3   // 中發白
+    };
+    if (!isContainSpecialPattern(fullHandCount, requiredTiles)) {
         return false;
     }
     return true;
 }
 
-function isAllPungs(fullHand, openHand) {
-    // This function needs to be implemented to check for all pongs/kongs
-    // It should account for the extra pair in a 17-tile hand
-    return false; // Placeholder
+
+function isWin(fullHand) {
+    if (fullHand.length !== 17) {
+        return false;
+    }
+    const handCount = getHandCount(fullHand);
+
+    for (let tile in handCount) {
+        tile = Number(tile);
+        if (handCount[tile] > 1) { // find the pair first
+            if (handCount[tile] === 2) {
+                delete handCount[tile];
+            } else {
+                handCount[tile] -= 2;
+            }
+            if (isWinHelper(handCount)) {
+                handCount[tile] = (handCount[tile] || 0) + 2;
+                return true;
+            }
+            handCount[tile] = (handCount[tile] || 0) + 2;
+        }
+    }
+
+    return false;
 }
 
-function isSevenPairsWithPair(closedHand) {
-    if (closedHand.length !== 17) return false;
-    const pairCounts = {};
-    for (const tile of closedHand) {
-        pairCounts[tile] = (pairCounts[tile] || 0) + 1;
+function isWinHelper(handCount) {
+    if (Object.keys(handCount).length === 0) {
+        return true;
     }
-    const counts = Object.values(pairCounts);
+
+    for (let tile in handCount) {
+        tile = Number(tile);
+        if ((tile + 1) in handCount && (tile + 2) in handCount) {
+            // if this is the sequence tile
+            for (let i = 0; i < 3; i++) {  // remove the sequence tiles
+                if (handCount[tile + i] === 1) {
+                    delete handCount[tile + i];
+                } else {
+                    handCount[tile + i] -= 1;
+                }
+            }
+
+            if (isWinHelper(handCount)) {
+                return true;
+            } else {
+                for (let i = 0; i < 3; i++) {  // add the sequence tiles back
+                    handCount[tile + i] = (handCount[tile + i] || 0) + 1;
+                }
+            }
+        }
+
+        // if this is the triplet tile
+        if (handCount[tile] >= 3) {
+            if (handCount[tile] === 3) {
+                delete handCount[tile];
+            } else {
+                handCount[tile] -= 3;
+            }
+            if (isWinHelper(handCount)) {
+                return true;
+            } else {
+                handCount[tile] = (handCount[tile] || 0) + 3;
+                return false;
+            }
+        }
+        
+        // If no valid set can be formed, return false
+        return false;
+    }
+
+    return false;
+}
+
+
+export function getHandCount(handTiles) {
+    const handCount = {};
+    for (const tile of handTiles) {
+        handCount[tile] = (handCount[tile] || 0) + 1;
+    }
+
+    return handCount;
+}
+
+function fromHandCountToList(handCount) {
+    const handList = [];
+    for (const tile in handCount) {
+        const count = handCount[tile];
+        for (let i = 0; i < count; i++) {
+            handList.push(Number(tile));
+        }
+    }
+    return handList;
+}
+
+export function isAllTriplets(fullHandCount) { // 對對糊
+    let pairCount = 0;
+    let tripletCount = 0;
+    for (const tile in fullHandCount) {
+        const count = fullHandCount[tile];
+        if (count === 2) {
+            pairCount += 1;
+        } else if (count === 3 || count === 4) {
+            tripletCount += 1;
+        } else {
+            return false;
+        }
+    }
+
+    return pairCount === 1 && tripletCount === (Object.keys(fullHandCount).length - 1);
+}
+
+export function isSevenPairs(closedHandCount) { // 嚦咕嚦咕
+    const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
+    if (sumOfTiles !== 17) return false;
+
+    const counts = Object.values(closedHandCount);
     return counts.filter(count => count === 2).length === 7 &&
            counts.filter(count => count === 3).length === 1;
 }
 
-function isPureStraight(fullHand) {
+export function isPureStraight(fullHand) { // 清一色
     const suit = Math.floor(fullHand[0] / 100) * 100;
     return fullHand.every(tile => Math.floor(tile / 100) * 100 === suit);
 }
 
-function isAllHonors(fullHand) {
-    return fullHand.every(tile => tile >= 1 && tile <= 7);
+export function isMixedStraight(fullHand) { // 混一色
+    const suit = Math.floor(fullHand[0] / 100) * 100;
+    return fullHand.every(tile => Math.floor(tile / 100) * 100 === suit || tile < 100);
+}
+
+function isAllHonors(fullHand) { // 字一色
+    return fullHand.every(tile => tile >= 1 && tile <= 15);
 }
 
 function isAllTerminals(fullHand) {
@@ -73,56 +214,56 @@ function isAllTerminals(fullHand) {
     });
 }
 
-// 十三么，十六不搭
-function isContainSpecialPattern(closedHand, requiredTiles) {
-    if (closedHand.length !== 17) return false;
+// 十三么，十六不搭, 大三元，大四喜
+function isContainSpecialPattern(handCounts, requiredTiles) {    
+    for (let tile in requiredTiles) {
+        if (!handCounts[tile] || handCounts[tile] < requiredTiles[tile]) {
+          return false;
+        }
+      }
 
-    const handCounts = {};
-    for (const tile of closedHand) {
-        handCounts[tile] = (handCounts[tile] || 0) + 1;
+    return true;
+}
+
+//十六不搭
+export function is16NotMatch (closedHandCount) {
+    const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
+    if (sumOfTiles !== 17) return false;
+    const requiredTiles = {
+        1: 1, 3: 1, 5: 1, 7: 1,   // 東南西北
+        11: 1, 13: 1, 15: 1   // 中發白
+    };
+    if (!isContainSpecialPattern(closedHandCount, requiredTiles)) {
+        return false;
     }
-    
-    const requiredTilesArray = Array.from(requiredTiles);
-    const hasRequiredTiles = requiredTilesArray.every(tile => handCounts[tile] >= 1);
 
-    if (!hasRequiredTiles) {
-        return {};
-    }
+    // 眼
+    let pairs = Object.entries(closedHandCount)
+    .filter(([tile, count]) => count === 2) 
+    .map(([tile, count]) => tile);
 
-    for (const tile of requiredTiles) {
-        if (handCounts[tile]) {
-            handCounts[tile]--; 
-            if (handCounts[tile] === 0) {
-                delete handCounts[tile]; 
+    let remainingHandCounts = {...closedHandCount}
+    for (const tile in requiredTiles) {
+        if (remainingHandCounts[tile]) {
+            remainingHandCounts[tile] -= requiredTiles[tile]; 
+            if (remainingHandCounts[tile] === 0) {
+                delete remainingHandCounts[tile]; 
             }
         }
     }
 
-    return handCounts;
-}
-
-function is16NotMatch (closedHand) {
-    const requiredTiles = new Set([
-        1, 2, 3, 4, 5, 6, 7, // 番子
-    ]);
-
-    const handCounts = isContainSpecialPattern(closedHand, requiredTiles);
-    if (handCounts.length === 0) {
+    if (remainingHandCounts.length === 0) {
         return false;
     }
 
-    let hasOnePair = false;
-    for (let tile of Object.keys(handCounts)) {
+    if (pairs.length !== 1) {
+        return false;
+    }
+    delete remainingHandCounts[pairs[0]]; // remove the pair
+
+    for (let tile of Object.keys(remainingHandCounts)) {
         tile = Number(tile);
-        if ((tile < 10 && handCounts[tile] === 1) || (tile > 10 && handCounts[tile] === 2)) { // 眼
-            if (hasOnePair) {
-                return false;
-            } else {
-                hasOnePair = true;
-            }
-        } else if ((tile + 1) in handCounts || (tile + 2) in handCounts) {
-            return false;
-        } else if (handCounts[tile] > 2){
+        if ((tile + 1) in remainingHandCounts || (tile + 2) in remainingHandCounts || remainingHandCounts[tile] > 2) {
             return false;
         }
     };
@@ -131,42 +272,47 @@ function is16NotMatch (closedHand) {
 }
 
 //十三么
-function isHongKongThirteenOrphans(closedHand) {
-    const requiredTiles = new Set([
-        101, 109, // 1筒, 9筒
-        111, 119, // 1條, 9條
-        121, 129, // 1萬, 9萬
-        1, 2, 3, 4, 5, 6, 7, // 番子
-    ]);
+export function isHongKongThirteenOrphans(closedHandCount) {
+    const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
+    if (sumOfTiles !== 17) return false;
 
-    const handCounts = isContainSpecialPattern(closedHand, requiredTiles);
-    if (handCounts.length === 0) {
+    const requiredTiles = {
+        101: 1, 109: 1, // 1筒, 9筒
+        201: 1,  209: 1, // 1條, 9條
+        301: 1, 309: 1, // 1萬, 9萬
+        1: 1, 3: 1, 5: 1, 7: 1,   // 東南西北
+        11: 1, 13: 1, 15: 1   // 中發白
+    };
+
+    if (!isContainSpecialPattern(closedHandCount, requiredTiles)) {
         return false;
     }
 
-
+    let remainingHandCounts = {...closedHandCount}
     let remainingTiles = [];
-    Object.keys(handCounts).forEach(tile => {
+    Object.keys(remainingHandCounts).forEach(tile => {
         tile = Number(tile);
-        if (handCounts[tile] === 1) {
-            if (tile > 10) { //不是番子
-                remainingTiles.push(tile);
-            }
-        } else if (handCounts[tile] === 2) {
-            if (requiredTiles.has(tile)){
+        if (requiredTiles[tile]) { // eliminate those necessary tiles
+            remainingHandCounts[tile] -= requiredTiles[tile];
+        }
+        if (remainingHandCounts[tile] === 0) {
+            delete remainingHandCounts[tile];
+        }
+        else if (remainingHandCounts[tile] === 1) {
+            remainingTiles.push(tile);
+        } else if (remainingHandCounts[tile] === 2) {
+            if (tile in requiredTiles){
                 remainingTiles.push(tile); // 眼 1123 -> remainingTiles: [1,2,3]
             } else { // 1223 
                 return false;
             }
-        } else if (handCounts[tile] === 4) { // 2222
+        } else if (remainingTiles[tile] === 4) { // 2222
             return false; 
-        }// else if (handCounts[tile] === 3) { // 刻子 1119
+        }// else if (remainingTiles[tile] === 3) { // 刻子 1119
     });
-
     if (remainingTiles.length === 1) {
-        return requiredTiles.has(remainingTiles[0]);
+        return remainingTiles[0] in requiredTiles;
     }
-    
     // 123, 234
     remainingTiles.sort((a, b) => a - b);
     if (remainingTiles.length === 3) {
@@ -176,7 +322,7 @@ function isHongKongThirteenOrphans(closedHand) {
     // 6789, 1239, 4569...
     let tmpTiles = remainingTiles.slice(0, 3);
     if (isSequence(tmpTiles)) {
-        if (requiredTiles.has(remainingTiles[3])) {
+        if (remainingTiles[3] in requiredTiles) {
             return true;
         }
     }
@@ -191,20 +337,9 @@ function isHongKongThirteenOrphans(closedHand) {
 
     return false;
 }
-    
+
 
 // call only tiles.length is 3
 function isSequence(tiles) {
     return tiles[0] + 1 === tiles[1] && tiles[1] + 1 === tiles[2];
 }
-
-// Helper function to check if a tile can form a valid sequence
-function isValidSequence(tile) {
-    const sequences = [
-        [101, 102, 103], // 1筒, 2筒, 3筒
-        [111, 112, 113], // 1條, 2條, 3條
-        [121, 122, 123], // 1萬, 2萬, 3萬
-    ];
-    return sequences.some(sequence => sequence.includes(tile));
-}
-
