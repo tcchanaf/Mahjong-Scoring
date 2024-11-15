@@ -9,6 +9,7 @@ export const tileMapping = {
 
 export function calculateScore(openHand, closedHand) {
     let fanCount = 0;
+    let results = [];
 
     // Combine open and closed hands for total hand evaluation
     const fullHand = [...openHand, ...closedHand];
@@ -19,10 +20,13 @@ export function calculateScore(openHand, closedHand) {
     const openHandCount = getHandCount(openHand);
     fanCount += 5;
 
-    if (isHongKongThirteenOrphans(closedHandCount)) fanCount += 100; // 十三么
-    else if (is16NotMatch(closedHandCount)) fanCount += 40; // 十六不搭
-    else if (isSevenPairs(closedHandCount)) fanCount += 40; // 嚦咕嚦咕
-    else if (!isWin(fullHandCount)) {
+    const [openGroups, closedGroups] = splitToGroups(closedHandCount, openHandCount);
+
+    const isNormalWu = isWin(closedGroups, openGroups);
+    if (isHongKongThirteenOrphans(closedHandCount, results)) fanCount += 100; // 十三么
+    else if (is16NotMatch(closedHandCount, results)) fanCount += 40; // 十六不搭
+    else if (isSevenPairs(closedHandCount, results)) fanCount += 40; // 嚦咕嚦咕
+    else if (!isNormalWu) {
         return 0;
     }
 
@@ -72,33 +76,39 @@ export function isGrandThreeChiefs(fullHandCount) {// 大三元
     return true;
 }
 
+export function splitToGroups(closedHandCount, openHandCount) {
+    const closedGroups = [];
+    const openGroups = [];
+    const tmpClosedHandCount = {...closedHandCount}
+    isWinHelper(openHandCount, openGroups); //open Hand
 
-function isWin(fullHand) {
-    if (fullHand.length !== 17) {
-        return false;
-    }
-    const handCount = getHandCount(fullHand);
-
-    for (let tile in handCount) {
+    //closed Hand
+    for (let tile in tmpClosedHandCount) {
         tile = Number(tile);
-        if (handCount[tile] > 1) { // find the pair first
-            if (handCount[tile] === 2) {
-                delete handCount[tile];
+        if (tmpClosedHandCount[tile] > 1) { // find the pair first
+            if (tmpClosedHandCount[tile] === 2) {
+                delete tmpClosedHandCount[tile];
             } else {
-                handCount[tile] -= 2;
+                tmpClosedHandCount[tile] -= 2;
             }
-            if (isWinHelper(handCount)) {
-                handCount[tile] = (handCount[tile] || 0) + 2;
-                return true;
-            }
-            handCount[tile] = (handCount[tile] || 0) + 2;
+            if (isWinHelper(tmpClosedHandCount, closedGroups)) {
+                closedGroups.push([tile, tile])
+                break;            }
+                tmpClosedHandCount[tile] = (tmpClosedHandCount[tile] || 0) + 2;
         }
     }
 
-    return false;
+    return [closedGroups, openGroups];
 }
 
-function isWinHelper(handCount) {
+function isWin(closedGroups, openGroups) {
+    let fullGroups = {...openGroups, ...closedGroups};
+    const pairCount = fullGroups.filter(group => group.length === 2).length;
+
+    return pairCount === 1 && fullGroups.length === 6;
+}
+
+function isWinHelper(handCount, groups) {
     if (Object.keys(handCount).length === 0) {
         return true;
     }
@@ -115,7 +125,8 @@ function isWinHelper(handCount) {
                 }
             }
 
-            if (isWinHelper(handCount)) {
+            if (isWinHelper(handCount, groups)) {
+                groups.push([tile, tile + 1, tile + 2]);
                 return true;
             } else {
                 for (let i = 0; i < 3; i++) {  // add the sequence tiles back
@@ -131,7 +142,8 @@ function isWinHelper(handCount) {
             } else {
                 handCount[tile] -= 3;
             }
-            if (isWinHelper(handCount)) {
+            if (isWinHelper(handCount, groups)) {
+                groups.push([tile, tile, tile]);
                 return true;
             } else {
                 handCount[tile] = (handCount[tile] || 0) + 3;
@@ -145,6 +157,7 @@ function isWinHelper(handCount) {
 
     return false;
 }
+
 
 
 export function getHandCount(handTiles) {
