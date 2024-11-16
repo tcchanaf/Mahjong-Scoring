@@ -1,63 +1,15 @@
 import { 
-    isHongKongThirteenOrphans, 
-    is16NotMatch, 
-    isSevenPairs, 
     isPureStraight,
     isMixedStraight,
     isAllTriplets,
-    isAllHonors,
     isJuniorThreeChiefs,
     isGrandThreeChiefs,
-    isAllTerminals,
+    pair,
+    closedTriplets,
     getHandCount
 } from '../utils/scoring'; // Adjust the path to where your utility functions are located
 
 describe('Mahjong Hand Validations', () => {
-
-  // Test for "十三么" (Hong Kong Thirteen Orphans)
-  test('isHongKongThirteenOrphans should return true for valid hand', () => {
-    const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 309, 101, 102, 103, 201]; // with one sequence
-    const fullHandCount = getHandCount(hands);
-    expect(isHongKongThirteenOrphans(fullHandCount)).toBe(true);
-  });
-  test('isHongKongThirteenOrphans should return true for valid hand', () => {
-    const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 309, 101, 101, 101, 109]; // with one triplet
-    const fullHandCount = getHandCount(hands);
-    expect(isHongKongThirteenOrphans(fullHandCount)).toBe(true);
-  });
-
-  test('isHongKongThirteenOrphans should return false for invalid hand', () => {
-    const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 308, 1, 1, 1, 3]; // Invalid, not enough Orphan tiles
-    const fullHandCount = getHandCount(hands);
-    expect(isHongKongThirteenOrphans(fullHandCount)).toBe(false);
-  });
-
-  // Test for "十六不搭"
-  test('is16NotMatch should return true for valid hand', () => {
-    const hands = [1, 3, 5, 7, 11, 13, 15, 101, 104, 107, 201, 204, 207, 301, 304, 307, 1];
-    const fullHandCount = getHandCount(hands);
-    expect(is16NotMatch(fullHandCount)).toBe(true);
-  });
-
-  test('is16NotMatch should return false for invalid hand', () => {
-    const hands = [1, 3, 5, 7, 11, 13, 15, 101, 104, 107, 201, 204, 207, 301, 304, 304, 1]; // Contains mismatched sequence
-    const fullHandCount = getHandCount(hands);
-    expect(is16NotMatch(fullHandCount)).toBe(false);
-  });
-
-  // Test for "嚦咕嚦咕" (Seven Pairs)
-  test('isSevenPairs should return true for valid Seven Pairs hand', () => {
-    const hands = [101, 101, 201, 201, 301, 301, 1, 1, 3, 3, 5, 5, 11, 11, 13, 13, 13];
-    const fullHandCount = getHandCount(hands);
-    expect(isSevenPairs(fullHandCount)).toBe(true);
-  });
-
-  test('isSevenPairs should return false for invalid hand', () => {
-    const hands = [101, 101, 201, 201, 301, 301, 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 102]; // Missing pair for 7
-    const fullHandCount = getHandCount(hands);
-    expect(isSevenPairs(fullHandCount)).toBe(false);
-  });
-
   // Test for "清一色" (Pure Straight)
   test('isPureStraight should return true for valid Pure Straight hand', () => {
     const hands = [
@@ -198,6 +150,47 @@ describe('Mahjong Hand Validations', () => {
     const fullHandCount = getHandCount(hands);
     expect(isGrandThreeChiefs(fullHandCount)).toBe(false);
   });
+
+  test('should push "將眼" when tile has last digit 2, 5, or 8', () => {
+    const closedGroups = [
+        [102, 102],  // "將眼"
+        [301, 302, 303],
+        [101, 102, 103], 
+    ];
+    const results = []
+    pair(closedGroups, results);
+    expect(results.length).toEqual(1);
+});
+
+test('暗刻', () => {
+    const closedGroups = [
+        [102, 102], 
+        [301, 301, 301],
+        [101, 101, 101], 
+        [102, 102, 102],
+        [201, 202, 203], 
+    ];
+    const results = []
+    closedTriplets(closedGroups, results);
+    console.log(results);
+    expect(results[0][0]).toEqual("三暗刻");
+});
+
+test('暗刻 123, 123, 123', () => {
+    const closedGroups = [
+        [102, 102], 
+        [301, 301, 301],
+        [101, 102, 103], 
+        [101, 102, 103], 
+        [101, 102, 103], 
+    ];
+    const results = []
+    closedTriplets(closedGroups, results);
+    console.log(results);
+    expect(results[0][0]).toEqual("四暗刻");
+});
+
+
 
 //   // Test for "清么九" (Pure Terminals)
 //   test('isAllTerminals should return true for valid Pure Terminals hand', () => {

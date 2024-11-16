@@ -2,14 +2,14 @@ export const tileMapping = {
     101: '1筒', 102: '2筒', 103: '3筒', 104: '4筒', 105: '5筒', 106: '6筒', 107: '7筒', 108: '8筒', 109: '9筒',
     201: '1條', 202: '2條', 203: '3條', 204: '4條', 205: '5條', 206: '6條', 207: '7條', 208: '8條', 209: '9條',
     301: '1萬', 302: '2萬', 303: '3萬', 304: '4萬', 305: '5萬', 306: '6萬', 307: '7萬', 308: '8萬', 309: '9萬',
-    1: '東風', 3: '南風', 5: '西風', 7: '北風',
-    11: '白龍', 13: '發財', 15: '中發',
+    1: '東', 3: '南', 5: '西', 7: '北',
+    11: '中', 13: '發', 15: '白',
     21: '春', 23: '夏', 25: '秋', 27: '冬',
 };
 
 export function calculateScore(openHand, closedHand) {
     let fanCount = 0;
-    let results = [];
+    let results = []; //format: [["faan name", faan count, [related tiles], ...]
 
     // Combine open and closed hands for total hand evaluation
     const fullHand = [...openHand, ...closedHand];
@@ -20,7 +20,7 @@ export function calculateScore(openHand, closedHand) {
     const openHandCount = getHandCount(openHand);
     fanCount += 5;
 
-    const [openGroups, closedGroups] = splitToGroups(closedHandCount, openHandCount);
+    const [closedGroups, openGroups] = splitToGroups(closedHandCount, openHandCount);
 
     const isNormalWu = isWin(closedGroups, openGroups);
     if (isHongKongThirteenOrphans(closedHandCount, results)) fanCount += 100; // 十三么
@@ -38,6 +38,7 @@ export function calculateScore(openHand, closedHand) {
     if (isAllHonors(fullHand)) fanCount += 10; // 字一色
     if (isJuniorThreeChiefs(fullHandCount)) fanCount += 30; // 小三元
     if (isGrandThreeChiefs(fullHandCount)) fanCount += 30; // 大三元
+    fourHappiness(fullHandCount, results);
     
 
     if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
@@ -48,13 +49,89 @@ export function calculateScore(openHand, closedHand) {
     return fanCount;
 }
 
+// 將眼
+export function pair(closedGroups, results) { //TODO handle seven pairs
+    for (const group of closedGroups) {
+        if (group.length === 2) {
+            if (group[0] < 100) {
+                continue;
+            }
+            const pair = group[0] % 10;
+            if (pair === 2 || pair === 5 || pair === 8) {
+                results.push(["將眼", 2, [group[0], group[0]]])
+            }
+        }
+    }
+}
+
+// 暗刻
+export function closedTriplets(closedGroups, results) {
+    const tmpClosedHandGroups = closedGroups.filter(group => group.length > 2);
+    let tripletCount = 0;
+    const groups = []
+    // if 暗三般高 -> 三暗刻: 123, 123, 123, 123 -> 111, 222, 333, 123
+    const sequenceCounts = {};
+    for (const group of tmpClosedHandGroups) {
+        if (group[0] === group[1] || group[1] === group[2]) {
+            tripletCount += 1;
+            groups.push(group);
+        } else if (isSequence(group)) {
+            const sequenceKey = group[0];
+            sequenceCounts[sequenceKey] = (sequenceCounts[sequenceKey] || 0) + 1;
+        }
+    }
+
+    for (let sequence in sequenceCounts) {
+        if (sequenceCounts[sequence] >= 3) { //暗三般高
+            tripletCount += 3;
+            sequence = Number(sequence);
+            groups.push([sequence, sequence, sequence]);
+            groups.push([sequence + 1, sequence + 1, sequence + 1]);
+            groups.push([sequence + 2, sequence + 2, sequence + 2]);
+        }
+    }
+
+    if (tripletCount === 2) {
+        results.push(["二暗刻", 3, groups])
+    } else if (tripletCount === 3) {
+        results.push(["三暗刻", 10, groups])
+    } else if (tripletCount === 4) {
+        results.push(["四暗刻", 30, groups])
+    } else if (tripletCount === 5) {
+        results.push(["五暗刻", 80, groups])
+    } //TODO 間間糊
+}
+
+//大四喜, 小四喜, 大三風, 小三風
+export function fourHappiness(fullHandCount, results) {
+    const windTiles = [1, 3, 5, 7]; //東南西北
+    let tripletCount = 0;
+    let pairCount = 0;
+    windTiles.forEach(tile => {
+        if (fullHandCount[tile] === 3) {
+            tripletCount++;
+        } else if (fullHandCount[tile] === 2) {
+            pairCount++;
+        }
+    });
+
+    if (tripletCount === 4) {
+        results.push(["大四喜", 80, []]);
+    } else if (tripletCount === 3 && pairCount === 1) {
+        results.push(["小四喜", 60, []]);
+    } else if (tripletCount === 3) {
+        results.push(["大三風", 30, []]);
+    } else if (tripletCount === 3 && pairCount === 1) {
+        results.push(["小三風", 15, []]);
+    }
+}
+
 
 export function isJuniorThreeChiefs(fullHandCount) {// 小三元	
     const dragonTiles = [11, 13, 15]; //中, 發, 白
     
     let tripletCount = 0;
     let pairCount = 0;
-
     dragonTiles.forEach(tile => {
         if (fullHandCount[tile] === 3) {
             tripletCount++;
@@ -79,10 +156,11 @@ export function isGrandThreeChiefs(fullHandCount) {// 大三元
 export function splitToGroups(closedHandCount, openHandCount) {
     const closedGroups = [];
     const openGroups = [];
-    const tmpClosedHandCount = {...closedHandCount}
-    isWinHelper(openHandCount, openGroups); //open Hand
+    let tmpClosedHandCount = {...closedHandCount}
+    splitHelper(openHandCount, openGroups); //open Hand
+    let pair = -1;
 
-    //closed Hand
+    //closed Hand prioritising sequence
     for (let tile in tmpClosedHandCount) {
         tile = Number(tile);
         if (tmpClosedHandCount[tile] > 1) { // find the pair first
@@ -91,8 +169,9 @@ export function splitToGroups(closedHandCount, openHandCount) {
             } else {
                 tmpClosedHandCount[tile] -= 2;
             }
-            if (isWinHelper(tmpClosedHandCount, closedGroups)) {
+            if (splitHelper(tmpClosedHandCount, closedGroups)) {
                 closedGroups.push([tile, tile])
+                pair = tile;
                 break;            }
                 tmpClosedHandCount[tile] = (tmpClosedHandCount[tile] || 0) + 2;
         }
@@ -108,7 +187,7 @@ function isWin(closedGroups, openGroups) {
     return pairCount === 1 && fullGroups.length === 6;
 }
 
-function isWinHelper(handCount, groups) {
+function splitHelper(handCount, groups) {
     if (Object.keys(handCount).length === 0) {
         return true;
     }
@@ -125,7 +204,7 @@ function isWinHelper(handCount, groups) {
                 }
             }
 
-            if (isWinHelper(handCount, groups)) {
+            if (splitHelper(handCount, groups)) {
                 groups.push([tile, tile + 1, tile + 2]);
                 return true;
             } else {
@@ -142,7 +221,7 @@ function isWinHelper(handCount, groups) {
             } else {
                 handCount[tile] -= 3;
             }
-            if (isWinHelper(handCount, groups)) {
+            if (splitHelper(handCount, groups)) {
                 groups.push([tile, tile, tile]);
                 return true;
             } else {
