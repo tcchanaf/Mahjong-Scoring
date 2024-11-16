@@ -8,6 +8,9 @@ export const tileMapping = {
 };
 
 export function calculateScore(openHand, closedHand) {
+    const wind = 1; //TODO as input, default 東圈 東位
+    const seat = 1;
+
     let fanCount = 0;
     let results = []; //format: [["faan name", faan count, [related tiles], ...]
 
@@ -36,9 +39,9 @@ export function calculateScore(openHand, closedHand) {
     if (isAllTriplets(fullHandCount)) fanCount += 30; // 對對糊
 
     if (isAllHonors(fullHand)) fanCount += 10; // 字一色
-    if (isJuniorThreeChiefs(fullHandCount)) fanCount += 30; // 小三元
-    if (isGrandThreeChiefs(fullHandCount)) fanCount += 30; // 大三元
-    fourHappiness(fullHandCount, results);
+    const threeChiefs = isThreeChiefs(fullHandCount, results); // 大小三元
+    const fourHappiness = fourHappiness(fullHandCount, results); // //大四喜, 小四喜, 大三風, 小三風
+    honorTile(fullHandCount, threeChiefs, fourHappiness, wind, seat, results);
     
 
     if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
@@ -47,6 +50,35 @@ export function calculateScore(openHand, closedHand) {
     // Add more scoring rules here
 
     return fanCount;
+}
+
+// 番子 東南西北 中發白 
+// TODO test case
+export function honorTile(fullHandCount, threeChiefs, fourHappiness, wind, seat, results) {
+    let honorTiles;
+    if (fourHappiness) {
+        honorTiles = [11, 13, 15]; //avoid double count 
+    } else if (threeChiefs) {
+        honorTiles = [1, 3, 5, 7]; //avoid double count 
+    } else {
+        honorTiles = [1, 3, 5, 7, 11, 13, 15]; //東南西北 中發白
+    }
+    let faanCount = 0;
+
+    honorTiles.forEach(tile => {
+        if (fullHandCount[tile] >= 3) {
+            if (tile === wind) {
+                faanCount += 1;
+            }
+            if (tile === seat) {
+                faanCount += 1;
+            }
+        }
+    });
+
+    if (faanCount > 0) {
+        results.push(["番子", faanCount, []]);
+    }
 }
 
 // 將眼
@@ -103,12 +135,13 @@ export function closedTriplets(closedGroups, results) {
 }
 
 //大四喜, 小四喜, 大三風, 小三風
+// TODO test case
 export function fourHappiness(fullHandCount, results) {
     const windTiles = [1, 3, 5, 7]; //東南西北
     let tripletCount = 0;
     let pairCount = 0;
     windTiles.forEach(tile => {
-        if (fullHandCount[tile] === 3) {
+        if (fullHandCount[tile] >= 3) {
             tripletCount++;
         } else if (fullHandCount[tile] === 2) {
             pairCount++;
@@ -121,44 +154,42 @@ export function fourHappiness(fullHandCount, results) {
         results.push(["小四喜", 60, []]);
     } else if (tripletCount === 3) {
         results.push(["大三風", 30, []]);
-    } else if (tripletCount === 3 && pairCount === 1) {
+    } else if (tripletCount === 2 && pairCount === 1) {
         results.push(["小三風", 15, []]);
     }
+
+    return tripletCount >= 3 || (tripletCount >= 2 && pairCount === 1);
 }
 
 
-export function isJuniorThreeChiefs(fullHandCount) {// 小三元	
+export function isThreeChiefs(fullHandCount, results) {// 大小三元	
     const dragonTiles = [11, 13, 15]; //中, 發, 白
     
     let tripletCount = 0;
     let pairCount = 0;
     dragonTiles.forEach(tile => {
-        if (fullHandCount[tile] === 3) {
+        if (fullHandCount[tile] >= 3) {
             tripletCount++;
         } else if (fullHandCount[tile] === 2) {
             pairCount++;
         }
     });
 
-    return tripletCount === 2 && pairCount === 1;
+    if (tripletCount === 3) {
+        results.push(["大三元", 40, []]);
+    } else if (tripletCount === 2 && pairCount === 1) {
+        results.push(["小三元", 20, []]);
+    }
+
+    return tripletCount === 3 || (tripletCount === 2 && pairCount === 1);
 }
 
-export function isGrandThreeChiefs(fullHandCount) {// 大三元	
-    const requiredTiles = {
-        11: 3, 13: 3, 15: 3   // 中發白
-    };
-    if (!isContainSpecialPattern(fullHandCount, requiredTiles)) {
-        return false;
-    }
-    return true;
-}
 
 export function splitToGroups(closedHandCount, openHandCount) {
     const closedGroups = [];
     const openGroups = [];
     let tmpClosedHandCount = {...closedHandCount}
     splitHelper(openHandCount, openGroups); //open Hand
-    let pair = -1;
 
     //closed Hand prioritising sequence
     for (let tile in tmpClosedHandCount) {
@@ -171,8 +202,8 @@ export function splitToGroups(closedHandCount, openHandCount) {
             }
             if (splitHelper(tmpClosedHandCount, closedGroups)) {
                 closedGroups.push([tile, tile])
-                pair = tile;
-                break;            }
+                break;   
+            }
                 tmpClosedHandCount[tile] = (tmpClosedHandCount[tile] || 0) + 2;
         }
     }
@@ -214,8 +245,19 @@ function splitHelper(handCount, groups) {
             }
         }
 
-        // if this is the triplet tile
         if (handCount[tile] >= 3) {
+            // assume quadruplet
+            if (handCount[tile] === 4) {
+                delete handCount[tile];
+                if (splitHelper(handCount, groups)) {
+                    groups.push([tile, tile, tile, tile]);
+                    return true;
+                } else {
+                    handCount[tile] = 4;
+                }
+            }
+
+            // if this is the triplet tile
             if (handCount[tile] === 3) {
                 delete handCount[tile];
             } else {
@@ -295,9 +337,7 @@ export function isMixedStraight(fullHand) { // 混一色
     return fullHand.every(tile => Math.floor(tile / 100) * 100 === suit || tile < 100);
 }
 
-function isAllHonors(fullHand) { // 字一色
-    return fullHand.every(tile => tile >= 1 && tile <= 15);
-}
+
 
 function isAllTerminals(fullHand) {
     return fullHand.every(tile => {

@@ -2,8 +2,7 @@ import {
     isPureStraight,
     isMixedStraight,
     isAllTriplets,
-    isJuniorThreeChiefs,
-    isGrandThreeChiefs,
+    isThreeChiefs,
     pair,
     closedTriplets,
     getHandCount
@@ -86,17 +85,6 @@ describe('Mahjong Hand Validations', () => {
     expect(isAllTriplets(hands)).toBe(false);
   });
 
-//   // Test for "字一色" (All Honors)
-//   test('isAllHonors should return true for valid All Honors hand', () => {
-//     const hands = [1, 3, 5, 7, 11, 13, 15, 1, 3, 5, 7, 11, 13]; // Only honors (winds and dragons)
-//     expect(isAllHonors(hands)).toBe(true);
-//   });
-
-//   test('isAllHonors should return false for invalid hand', () => {
-//     const hands = [1, 3, 5, 7, 101, 102, 103, 11, 13, 15]; // Contains a number tile
-//     expect(isAllHonors(hands)).toBe(false);
-//   });
-
   // Test for "小三元" (Junior Three Chiefs)
   test('isJuniorThreeChiefs should return true for valid Junior Three Chiefs hand', () => {
     const hands = [
@@ -108,7 +96,9 @@ describe('Mahjong Hand Validations', () => {
         15, 15,
         ];
     const fullHandCount = getHandCount(hands);
-    expect(isJuniorThreeChiefs(fullHandCount)).toBe(true);
+    const results = [];
+    expect(isThreeChiefs(fullHandCount, results)).toBe(true);
+    expect(results[0][0]).toEqual("小三元");
   });
 
   test('isJuniorThreeChiefs should return false for invalid hand', () => {
@@ -120,8 +110,9 @@ describe('Mahjong Hand Validations', () => {
         201, 201, 201,
         301, 301, 
     ];
+    const results = [];
     const fullHandCount = getHandCount(hands);
-    expect(isJuniorThreeChiefs(fullHandCount)).toBe(false);
+    expect(isThreeChiefs(fullHandCount, results)).toBe(false);
   });
 
   // Test for "大三元" (Grand Three Chiefs)
@@ -134,8 +125,10 @@ describe('Mahjong Hand Validations', () => {
         201, 201, 201,
         301, 301
     ];
+    const results = [];
     const fullHandCount = getHandCount(hands);
-    expect(isGrandThreeChiefs(fullHandCount)).toBe(true);
+    expect(isThreeChiefs(fullHandCount, results)).toBe(true);
+    expect(results[0][0]).toEqual("大三元");
   });
 
   test('isGrandThreeChiefs should return false for invalid hand', () => {
@@ -147,8 +140,9 @@ describe('Mahjong Hand Validations', () => {
         201, 201, 201,
         301, 301
     ];// Missing one dragon triplet
+    const results = [];
     const fullHandCount = getHandCount(hands);
-    expect(isGrandThreeChiefs(fullHandCount)).toBe(false);
+    expect(isThreeChiefs(fullHandCount, results)).toBe(false);
   });
 
   test('should push "將眼" when tile has last digit 2, 5, or 8', () => {
@@ -172,7 +166,6 @@ test('暗刻', () => {
     ];
     const results = []
     closedTriplets(closedGroups, results);
-    console.log(results);
     expect(results[0][0]).toEqual("三暗刻");
 });
 
@@ -186,7 +179,6 @@ test('暗刻 123, 123, 123', () => {
     ];
     const results = []
     closedTriplets(closedGroups, results);
-    console.log(results);
     expect(results[0][0]).toEqual("四暗刻");
 });
 

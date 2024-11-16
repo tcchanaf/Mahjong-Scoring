@@ -69,6 +69,23 @@ describe('Mahjong Hand Validations', () => {
         expect(openGroups).toEqual([[301, 301, 301]]);
     });
 
+    it('splitToGroups handle a quadruplet hand', () => {
+        const closedHandCount = [101, 101, 101, 101, 102, 102, 102, 103, 103, 103, 201, 201, 201, 1, 1]; 
+        const openHandCount = [301, 301, 301]; 
+        const [closedGroups, openGroups] = splitToGroups(getHandCount(closedHandCount), getHandCount(openHandCount));
+
+        // Check the result of closed and open hand groups
+        expect(new Set(closedGroups)).toEqual(
+            new Set([
+                [101, 101, 101, 101],
+                [102, 102, 102],
+                [103, 103, 103],
+                [201, 201, 201],
+                [1, 1]
+            ]));
+        expect(openGroups).toEqual([[301, 301, 301]]);
+    });
+
       // Test for "十三么" (Hong Kong Thirteen Orphans)
     test('isHongKongThirteenOrphans should return true for valid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 309, 101, 102, 103, 201]; // with one sequence
