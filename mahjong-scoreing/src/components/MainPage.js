@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { Switch, FormControlLabel } from '@mui/material';
 import SelectBoard from './DisplayBoard';
+import FlowerBoard from './FlowerBoard';
 import DisplayRow from './DisplayRow';
 import ResultBoard from './ResultBoard';
 import './MainPage.css';
 import './ResultModal.css';
 import { calculateScore } from '../utils/scoring';
 
-const tiles = {
-    tungzi: [101, 102, 103, 104, 105, 106, 107, 108, 109],  // 筒子: 1筒 to 9筒
-    sokzi: [201, 202, 203, 204, 205, 206, 207, 208, 209],  // 條: 1條 to 9條
-    maanzi: [301, 302, 303, 304, 305, 306, 307, 308, 309],  // 萬子: 1萬 to 9萬
-    faanzi: [1, 3, 5, 7, 11, 13, 15],  // 番子: 東風, 南風, 西風, 北風, 白龍, 發財, 中發
-    faa: [21, 23, 25, 27],  // 花: 春, 夏, 秋, 冬
-};
 
 const MainPage = () => {
   const [openHand, setOpenHand] = useState([]);  // 明牌 (Open Hand)
@@ -21,6 +15,8 @@ const MainPage = () => {
   const [isOpenHand, setIsOpenHand] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [score, setScore] = useState(null);
+
+  const [flowerTilesState, setFlowerTilesState] = useState(new Array(8).fill(0));
 
   const handleTileClick = (tile) => {
     if (isOpenHand) {
@@ -55,6 +51,16 @@ const MainPage = () => {
     setModalOpen(false);
   };
 
+
+  // Handle the click event for a flower tile to toggle its state
+  const handleFlowerTile = (index) => {
+      setFlowerTilesState((prevState) => {
+          const newState = { ...prevState };
+          newState[index] = newState[index] === 0 ? 1 : 0;
+          return newState;
+      });
+  };
+
   return (
     <div className="main-page">
       <div className="header">
@@ -65,43 +71,46 @@ const MainPage = () => {
           label={isOpenHand ? '明牌 (Open Hand)' : '暗牌 (Closed Hand)'}
         />
       </div>
-
-      <SelectBoard
-        tiles={tiles} 
-        handleTileClick={handleTileClick}
-      />
-
-      <div className="selected-tiles">
-        <button onClick={handleRemoveLastTile} className="remove-button">
-          移除上一個選擇
-        </button>
-      </div>
-
-      <div className="open-hand">
-        <h2>明牌:</h2>
-        <div className="tile-row">
-            <DisplayRow
-                tiles={openHand}
-                handleTileClick={handleTileClick}
-            />
+      <div className="select-board-container">
+        <div className="select-board-first">
+          <SelectBoard
+            handleTileClick={handleTileClick}
+          />
+        </div>
+        <div className="select-board-second">
+          <FlowerBoard
+            handleTileClick={handleFlowerTile}
+            flowerTilesState={flowerTilesState}
+          />
+        </div>
+        {/* TODO right board */}
+        <div className="select-board-right">
+          <button onClick={handleRemoveLastTile} className="remove-button">
+            移除上一個選擇
+          </button>
+          <button onClick={handleCalculateScore} className="calculate-button">
+            計番
+          </button>
         </div>
       </div>
 
-      <div className="closed-hand">
-        <h2>暗牌:</h2>
-        <div className="tile-row">
-            <DisplayRow
-                tiles={closedHand}
-                handleTileClick={handleTileClick}
-            />
-        </div>
-      </div>
 
-      <div className="calculate-score">
-        <button onClick={handleCalculateScore} className="calculate-button">
-          計番
-        </button>
-      </div>
+        <h2 className="tile-section-title">明牌:</h2>
+        <DisplayRow
+            className="tile-row-display"
+            tiles={openHand}
+            handleTileClick={handleTileClick}
+        />
+
+
+        <h2 className="tile-section-title">暗牌:</h2>
+        <DisplayRow
+            className="tile-row-display"
+            tiles={closedHand}
+            handleTileClick={handleTileClick}
+        />
+
+
 
       <ResultBoard score={score} open={modalOpen} onClose={handleCloseModal} />
     </div>

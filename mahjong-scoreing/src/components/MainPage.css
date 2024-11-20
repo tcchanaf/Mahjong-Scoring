@@ -16,24 +16,59 @@
     color: #6200ea;
     margin: 0;
   }
+  .select-board-container {
+    border: 2px solid #000; /* Black border with 2px thickness */
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f4f4f4; /* Optional: Background color for contrast */
+    display: flex;
+    flex-direction: column;
+  }
+  .select-board-first {
+    flex: 1;
+  }
   
-  .tile-grid {
-    margin-bottom: 20px;
+  .select-board-second {
+    flex: 1;
+  }
+  .select-board-third {
+    flex: 1;
+    display: flex;
+    flex-direction: row;  
+    
+    gap: 10px;               
+    align-items: center;     
+    padding: 50px; 
   }
   
   .tile-row {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    margin: 10px 0;
+    gap: 10px;
+    margin: 5px 0;
   }
-  
+
+  .tile-row-display {
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+    margin: 5px 0;
+  }
+
+  .tile.tile-display {
+    width: 10px;
+    height: 28px;
+  }
+  .tile-section-title {
+    font-size: 15px; /* Set the font size */
+    font-weight: bold; /* Optionally, make the text bold */
+    color: #333; /* Adjust the text color */
+    margin-bottom: 1px; /* Optional: Add some space below the title */
+    text-align: center; /* Optional: Center the title */
+  }
   .tile {
-    width: 60px;
-    height: 80px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    width: 25px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,36 +76,52 @@
     cursor: pointer;
     transition: transform 0.3s ease;
   }
+  .tile img {
+    width: 100%; 
+    height: 100%;
+    object-fit: contain;
+  }
   
   .tile:hover {
     transform: scale(1.05);
   }
-  
-  .selected-tiles {
-    margin-top: 20px;
+
+  .tile.active {
+    background-color: #4caf50;
+    border-color: #388e3c; 
   }
   
-  .selected-tiles-row {
-    display: flex;
-    justify-content: center; 
-    gap: 12px;               
-    flex-wrap: nowrap;       
-    overflow-x: auto;        
+  .tile.inactive {
+    background-color: #f0f0f0; 
+    border-color: #ddd;
   }
   
+  .remove-button, .calculate-button {
+    width: 150px;           
+    padding: 10px;          
+    font-size: 16px;        
+    margin: 0;              
+    cursor: pointer;        
+    border-radius: 10px;     
+    border: none;           
+    transition: background-color 0.3s ease;
+  }
   .remove-button {
-    margin-top: 20px;
-    padding: 10px 20px;
     background-color: #6200ea;
     color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
   }
   
   .remove-button:hover {
     background-color: #3700b3;
+  }
+
+  .calculate-button {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .calculate-button:hover {
+    background-color: #45a049;
   }
   
   .switch-container {

@@ -1,17 +1,23 @@
 import React from 'react';
 import DisplayRow from './DisplayRow';
+import { tiles } from "../utils/constant"
+import './MainPage.css';
 
-const SelectBoard = ({ tiles, handleTileClick }) => {
+const SelectBoard = ({ handleTileClick }) => {
   return (
-    <div className="tile-grid">
-      {Object.keys(tiles).map((category, index) => (
-        <DisplayRow
-          key={index}
-          tiles={tiles[category]} 
-          handleTileClick={handleTileClick}
-        />
-      ))}
-    </div>
+      <div>
+        {["tungzi", "sokzi", "maanzi", "faanzi"].map((category, index) => {
+            return (
+                <DisplayRow
+                  className="tile-row"
+                  key={index}
+                  tiles={tiles[category]}
+                  handleTileClick={handleTileClick}
+                />
+            );
+          })
+        }
+      </div>
   );
 };
 

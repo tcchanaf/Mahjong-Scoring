@@ -12,21 +12,7 @@
     margin-top: 20px;
   }
   
-  .calculate-score {
-    margin-top: 20px;
-  }
-  
-  .calculate-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .calculate-button:hover {
-    background-color: #45a049;
-  }
+
   
   /* Modal Styling */
   .MuiModal-root {

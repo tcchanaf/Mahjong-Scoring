@@ -1,21 +1,18 @@
-import { tileMapping } from '../utils/scoring';
 import React from 'react';
 
-const DisplayRow = ({ tiles, handleTileClick }) => {
+const DisplayRow = ({ tiles, handleTileClick, className }) => {
   return (
-    <div className="tile-category">
-      <div className="tile-row">
+      <div className={`${className}`} >
         {tiles.map((tile, index) => (
           <div
             key={index}
             className="tile"
             onClick={() => handleTileClick(tile)} 
           >
-            {tileMapping[tile]}
+              <img src={`/images/${tile}.png`} alt={tile} className="tile-image" />
           </div>
         ))}
       </div>
-    </div>
   );
 };
 
