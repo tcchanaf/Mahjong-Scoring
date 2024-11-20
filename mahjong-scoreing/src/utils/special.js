@@ -105,7 +105,7 @@ export function thirteenOrphans(closedHandCount) {
     // 1234, 1789, 1567
     tmpTiles = remainingTiles.slice(1, 4);
     if (isSequence(tmpTiles)) {
-        if (requiredTiles.has(remainingTiles[0])) {
+        if (remainingTiles[0] in requiredTiles) {
             return true;
         }
     }
