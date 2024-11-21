@@ -83,6 +83,15 @@
   }
   
  
+  .wind-seat-button {
+    width: 80px;           
+    padding: 10px;          
+    font-size: 20px;        
+    border-radius: 15px;     
+    transition: background-color 0.3s ease;
+  }
+
+
 
   .remove-button, .calculate-button {
     width: 100px;           

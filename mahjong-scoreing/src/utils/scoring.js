@@ -16,10 +16,7 @@ import {
 } from '../utils/honor';
 
 
-export function calculateScore(openHand, closedHand, flowers) {
-    const wind = 1; //TODO as input, default 東圈 東位
-    const seat = 1;
-
+export function calculateScore(openHand, closedHand, flowers, wind, seat) {
     let fanCount = 0;
     let results = []; //format: [["faan name", faan count, [related tiles], ...]
 
