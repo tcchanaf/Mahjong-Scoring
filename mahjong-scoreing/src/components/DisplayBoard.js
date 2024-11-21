@@ -9,7 +9,6 @@ const SelectBoard = ({ handleTileClick }) => {
         {["tungzi", "sokzi", "maanzi", "faanzi"].map((category, index) => {
             return (
                 <DisplayRow
-                  className="tile-row"
                   key={index}
                   tiles={tiles[category]}
                   handleTileClick={handleTileClick}

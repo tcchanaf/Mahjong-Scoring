@@ -1,8 +1,8 @@
 import React from 'react';
 
-const DisplayRow = ({ tiles, handleTileClick, className }) => {
+const DisplayRow = ({ tiles, handleTileClick }) => {
   return (
-      <div className={`${className}`} >
+      <div className="tile-row" >
         {tiles.map((tile, index) => (
           <div
             key={index}

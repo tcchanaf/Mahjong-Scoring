@@ -12,9 +12,10 @@ import { calculateScore } from '../utils/scoring';
 const MainPage = () => {
   const [openHand, setOpenHand] = useState([]);  // 明牌 (Open Hand)
   const [closedHand, setClosedHand] = useState([]);  // 暗牌 (Closed Hand)
-  const [isOpenHand, setIsOpenHand] = useState(true);
+  const [isOpenHand, setIsOpenHand] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [score, setScore] = useState(null);
+  const [results, setResults] = useState([]);
 
   const [flowerTilesState, setFlowerTilesState] = useState(new Array(8).fill(0));
 
@@ -40,10 +41,18 @@ const MainPage = () => {
     }
   };
 
+  const handleReset = ()  => {
+    setOpenHand([]);
+    setClosedHand([]);
+    setFlowerTilesState(new Array(8).fill(0));
+  }
+
   // Handle opening the modal and calculating the score
   const handleCalculateScore = () => {
-    const calculatedScore = calculateScore(openHand, closedHand);
+    const faanResults = calculateScore(openHand, closedHand);
+    const calculatedScore = 0;
     setScore(calculatedScore);
+    setResults(faanResults);
     setModalOpen(true);
   };
 
@@ -51,8 +60,6 @@ const MainPage = () => {
     setModalOpen(false);
   };
 
-
-  // Handle the click event for a flower tile to toggle its state
   const handleFlowerTile = (index) => {
       setFlowerTilesState((prevState) => {
           const newState = { ...prevState };
@@ -83,10 +90,13 @@ const MainPage = () => {
             flowerTilesState={flowerTilesState}
           />
         </div>
-        {/* TODO right board */}
-        <div className="select-board-right">
+
+        <div className="select-board-third">
+          <button onClick={handleReset} className="remove-button">
+            重設
+          </button>
           <button onClick={handleRemoveLastTile} className="remove-button">
-            移除上一個選擇
+            移除上一張牌
           </button>
           <button onClick={handleCalculateScore} className="calculate-button">
             計番
@@ -95,13 +105,13 @@ const MainPage = () => {
       </div>
 
 
-        <h2 className="tile-section-title">明牌:</h2>
+      <div className="display">
+        <h2 className="tile-section-title">門前:</h2>
         <DisplayRow
             className="tile-row-display"
             tiles={openHand}
             handleTileClick={handleTileClick}
         />
-
 
         <h2 className="tile-section-title">暗牌:</h2>
         <DisplayRow
@@ -109,10 +119,10 @@ const MainPage = () => {
             tiles={closedHand}
             handleTileClick={handleTileClick}
         />
+      </div>
 
 
-
-      <ResultBoard score={score} open={modalOpen} onClose={handleCloseModal} />
+      <ResultBoard score={score} results={results} open={modalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

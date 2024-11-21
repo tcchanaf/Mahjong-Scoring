@@ -41,20 +41,34 @@ export function calculateScore(openHand, closedHand) {
     if (thirteenOrphans(closedHandCount, results)) {  // 十三么
         fanCount += 100;
         isThirteenOrphans = true;
-        results.push("十三么", 100, []);
+        results.push(["十三么", 100, [1, 3, 5]]);
+        results.push(["十六么", 100, [11, 13, 15]]);
     }
     else if (sixteenNotMatch(closedHandCount, results)) {// 十六不搭
         fanCount += 40; 
         isSixteenNotMatch = true;
-        results.push("十六不搭", 40, []);
+        results.push(["十六不搭", 40, []]);
     }
     else if (sevenPairs(closedHandCount, results)){ // 嚦咕嚦咕
         fanCount += 40;
         isSevenPairs = true;
-        results.push("嚦咕嚦咕", 40, []);
+        results.push(["嚦咕嚦咕", 40, []]);
     } 
     else if (!isNormalWu) {
-        return 0;
+        return [
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
+            ["十六么", 100, []],
+            ["十六么", 100, []],
+        ];
+        // return [0, []];
     }
 
     if (isNormalWu) {
@@ -77,7 +91,7 @@ export function calculateScore(openHand, closedHand) {
     
     // Add more scoring rules here
 
-    return fanCount;
+    return [fanCount, results];
 }
 
 

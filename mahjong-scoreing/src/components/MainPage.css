@@ -32,13 +32,10 @@
     flex: 1;
   }
   .select-board-third {
-    flex: 1;
-    display: flex;
-    flex-direction: row;  
-    
-    gap: 10px;               
-    align-items: center;     
-    padding: 50px; 
+    display: flex; /* Enable flexbox */
+    justify-content: center; /* Center the items horizontally */
+    gap: 20px; /* Space between buttons */
+    padding: 10px;
   }
   
   .tile-row {
@@ -48,23 +45,12 @@
     margin: 5px 0;
   }
 
-  .tile-row-display {
-    display: flex;
-    justify-content: center;
-    gap: 1px;
-    margin: 5px 0;
-  }
-
-  .tile.tile-display {
-    width: 10px;
-    height: 28px;
-  }
   .tile-section-title {
-    font-size: 15px; /* Set the font size */
-    font-weight: bold; /* Optionally, make the text bold */
-    color: #333; /* Adjust the text color */
-    margin-bottom: 1px; /* Optional: Add some space below the title */
-    text-align: center; /* Optional: Center the title */
+    font-size: 15px; 
+    font-weight: bold; 
+    color: #333; 
+    margin-bottom: 1px; 
+    text-align: center; 
   }
   .tile {
     width: 25px;
@@ -96,13 +82,15 @@
     border-color: #ddd;
   }
   
+ 
+
   .remove-button, .calculate-button {
-    width: 150px;           
+    width: 100px;           
     padding: 10px;          
-    font-size: 16px;        
+    font-size: 10px;        
     margin: 0;              
     cursor: pointer;        
-    border-radius: 10px;     
+    border-radius: 15px;     
     border: none;           
     transition: background-color 0.3s ease;
   }
@@ -123,12 +111,25 @@
   .calculate-button:hover {
     background-color: #45a049;
   }
-  
-  .switch-container {
-    margin-bottom: 20px;
+
+
+
+  .display .tile-row {
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+    margin: 5px 0;
   }
-  
-  .toggle-container {
-    margin-bottom: 20px;
+
+  .display .tile {
+    width: 20px;
+    height: 28px;
   }
-  
+
+  .display{
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #818888; 
+    display: flex;
+    flex-direction: column;
+  }

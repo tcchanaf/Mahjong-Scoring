@@ -1,20 +1,4 @@
-.main-page {
-    font-family: 'Arial', sans-serif;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .selected-tiles {
-    margin-top: 20px;
-  }
-  
-
-  
-  /* Modal Styling */
+/* Modal Styling */
   .MuiModal-root {
     display: flex;
     justify-content: center;
@@ -27,18 +11,17 @@
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 300px;
-    max-width: 90%;
+    width: 400px;
+    max-width: 100%;
+    max-height: 400px;
+    overflow: hidden;  
   }
   
-  .modal-box h2 {
-    margin-bottom: 20px;
+  #score-modal-title {
+    font-size: 24px;
+    margin-bottom: 10px;  
   }
-  
-  .modal-box p {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-  }
+
   
   .modal-box button {
     background-color: #00796b;
@@ -51,4 +34,26 @@
   .modal-box button:hover {
     background-color: #004d40;
   }
+  .modal-box .tile-row {
+    gap: 1px;
+  }
+  .modal-box .tile {
+    pointer-events: none; 
+    width: 20px;
+    height: 28px;
+  }
   
+  .result-content {
+    max-height: 250px; /* Limit height of the scrollable content */
+    margin-bottom: 20px;
+    overflow-y: auto;
+  }
+  
+  .result-item {
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
