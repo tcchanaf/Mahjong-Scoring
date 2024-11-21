@@ -16,7 +16,7 @@ import {
 } from '../utils/honor';
 
 
-export function calculateScore(openHand, closedHand) {
+export function calculateScore(openHand, closedHand, flowers) {
     const wind = 1; //TODO as input, default 東圈 東位
     const seat = 1;
 

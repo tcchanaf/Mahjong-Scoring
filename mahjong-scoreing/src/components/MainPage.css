@@ -53,8 +53,8 @@
     text-align: center; 
   }
   .tile {
-    width: 25px;
-    height: 35px;
+    width: 35px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -73,13 +73,13 @@
   }
 
   .tile.active {
-    background-color: #4caf50;
-    border-color: #388e3c; 
+    width: 35px;
+    height: 50px;
   }
   
   .tile.inactive {
-    background-color: #f0f0f0; 
-    border-color: #ddd;
+    width: 25px;
+    height: 35px;
   }
   
  
@@ -124,6 +124,7 @@
   .display .tile {
     width: 20px;
     height: 28px;
+    pointer-events: none; 
   }
 
   .display{

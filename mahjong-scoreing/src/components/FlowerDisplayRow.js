@@ -1,6 +1,3 @@
-import { tileMapping } from '../utils/constant';
-
-
 const FlowerDisplayRow = ({ tiles, handleTileClick, tileState }) => {
     return (
         <div className="tile-row">

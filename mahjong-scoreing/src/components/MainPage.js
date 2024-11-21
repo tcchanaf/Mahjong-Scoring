@@ -7,6 +7,7 @@ import ResultBoard from './ResultBoard';
 import './MainPage.css';
 import './ResultModal.css';
 import { calculateScore } from '../utils/scoring';
+import { tiles } from "../utils/constant"
 
 
 const MainPage = () => {
@@ -49,7 +50,11 @@ const MainPage = () => {
 
   // Handle opening the modal and calculating the score
   const handleCalculateScore = () => {
-    const faanResults = calculateScore(openHand, closedHand);
+    const flowers = flowerTilesState
+      .map((value, index) => (value === 1 ? tiles["flowers"][index] : null))
+      .filter(value => value !== null);
+    
+    const faanResults = calculateScore(openHand, closedHand, flowers);
     const calculatedScore = 0;
     setScore(calculatedScore);
     setResults(faanResults);
@@ -62,7 +67,7 @@ const MainPage = () => {
 
   const handleFlowerTile = (index) => {
       setFlowerTilesState((prevState) => {
-          const newState = { ...prevState };
+          const newState = [...prevState ];
           newState[index] = newState[index] === 0 ? 1 : 0;
           return newState;
       });
@@ -75,7 +80,7 @@ const MainPage = () => {
 
         <FormControlLabel
           control={<Switch checked={isOpenHand} onChange={handleSwitchChange} />}
-          label={isOpenHand ? '明牌 (Open Hand)' : '暗牌 (Closed Hand)'}
+          label={isOpenHand ? '門前' : '暗牌'}
         />
       </div>
       <div className="select-board-container">
