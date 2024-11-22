@@ -70,12 +70,9 @@ export function splitToGroups(closedHandCount, openHandCount) {
 }
 
 export function isWin(closedGroups, openGroups) {
-    let fullGroups = {...openGroups, ...closedGroups};
-    if (Object.keys(fullGroups).length === 0) return false;
-    console.log("fullGroups", fullGroups);
-    const pairCount = fullGroups.filter(group => group.length === 2).length;
+    let fullGroups = [...openGroups, ...closedGroups];
 
-    return pairCount === 1 && fullGroups.length === 6;
+    return fullGroups.length === 5;
 }
 
 function splitHelper(handCount, groups) {

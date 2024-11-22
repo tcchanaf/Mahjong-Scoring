@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch, FormControlLabel, Button } from '@mui/material';
 import SelectBoard from './DisplayBoard';
 import FlowerBoard from './FlowerBoard';
@@ -13,6 +13,7 @@ import { tiles } from "../utils/constant"
 const MainPage = () => {
   const [openHand, setOpenHand] = useState([]);  // 明牌 (Open Hand)
   const [closedHand, setClosedHand] = useState([]);  // 暗牌 (Closed Hand)
+  const [finalTile, setFinalTile] = useState(null);
   const [isOpenHand, setIsOpenHand] = useState(false);
 
   const [flowerTilesState, setFlowerTilesState] = useState(new Array(8).fill(0));
@@ -23,17 +24,30 @@ const MainPage = () => {
   const [selectedWind, setSelectedWind] = useState(winds[0]);
   const [selectedSeat, setSelectedSeat] = useState(seats[0]);
 
+  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [score, setScore] = useState(null);
   const [results, setResults] = useState([]);
+
+
+  useEffect(() => {
+    if (closedHand.length > 0) {
+      setFinalTile(closedHand[closedHand.length - 1]);
+    } else {
+      setFinalTile(null);
+    }
+  }, [closedHand]); // Dependency array to trigger useEffect when closedHand changes
 
 
   const handleTileClick = (tile) => {
     if (isOpenHand) {
       setOpenHand((prevOpenHand) => [...prevOpenHand, tile]);
     } else {
+      setFinalTile(tile);
       setClosedHand((prevClosedHand) => [...prevClosedHand, tile]);
     }
+
   };
 
   // Handle switch change between Open Hand and Closed Hand
@@ -89,8 +103,8 @@ const handleCalculateScore = () => {
   const wind = tiles["winds"][winds.indexOf(selectedWind)];
   const seat = tiles["winds"][seats.indexOf(selectedSeat)];
 
-  
   const faanResults = calculateScore(openHand, closedHand, flowers, wind, seat);
+  console.log("faanResults", faanResults);
   const calculatedScore = 0;
   setScore(calculatedScore);
   setResults(faanResults);
@@ -110,7 +124,7 @@ const handleCalculateScore = () => {
             handleTileClick={handleTileClick}
           />
         </div>
-        <div className="select-board-second">
+        <div className="select-board-flower">
           <FlowerBoard
             handleTileClick={handleFlowerTile}
             flowerTilesState={flowerTilesState}
@@ -145,21 +159,30 @@ const handleCalculateScore = () => {
 
 
       <div className="display">
-        <h2 className="tile-section-title">門前:</h2>
-        <DisplayRow
+        <div className="tile-row-section">
+          <h2 className="tile-section-title">門前:</h2>
+          <DisplayRow
             className="tile-row-display"
             tiles={openHand}
             handleTileClick={handleTileClick}
-        />
+          />
 
-        <h2 className="tile-section-title">暗牌:</h2>
-        <DisplayRow
+          <h2 className="tile-section-title">暗牌:</h2>
+          <DisplayRow
             className="tile-row-display"
-            tiles={closedHand}
+            tiles={closedHand.slice(0, closedHand.length - 1)}
             handleTileClick={handleTileClick}
-        />
-      </div>
+          />
+        </div>
 
+        <div className="tile-container">
+          {finalTile && (
+            <div className="tile">
+              <img src={`/images/${finalTile}.png`} className="tile-image" />
+            </div>
+          )}
+        </div>
+      </div>
 
       <ResultBoard score={score} results={results} open={modalOpen} onClose={handleCloseModal} />
     </div>

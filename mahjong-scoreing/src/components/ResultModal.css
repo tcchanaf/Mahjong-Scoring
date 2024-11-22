@@ -44,7 +44,7 @@
   }
   
   .result-content {
-    max-height: 250px; /* Limit height of the scrollable content */
+    max-height: 250px;
     margin-bottom: 20px;
     overflow-y: auto;
   }

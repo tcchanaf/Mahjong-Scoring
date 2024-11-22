@@ -5,10 +5,7 @@ import {
     isPureStraight,
     isMixedStraight
 } from '../utils/flush';
-import { allClosedHand, pair } from "../utils/wining";
-import { 
-    allSequence,
-} from '../utils/combination';
+import { allClosedHand } from "../utils/wining";
 import { 
     threeChiefs,
     honorTile,
@@ -88,7 +85,7 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat) {
     
     // Add more scoring rules here
 
-    return [fanCount, results];
+    return results;
 }
 
 
