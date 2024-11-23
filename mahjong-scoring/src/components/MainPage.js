@@ -195,7 +195,7 @@ const MainPage = () => {
         <div className="tile-container">
           {finalTile && (
             <div className="tile">
-              <img src={`/images/${finalTile}.png`} className="tile-image" />
+              <img src={`${process.env.PUBLIC_URL}/images/${finalTile}.png`} className="tile-image" />
             </div>
           )}
         </div>
