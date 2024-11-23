@@ -1,1 +1,1 @@
-# Mahjong-Scoreing
+# Mahjong-Scoring
