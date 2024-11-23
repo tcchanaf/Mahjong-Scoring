@@ -9,7 +9,7 @@ const FlowerDisplayRow = ({ tiles, handleTileClick, tileState }) => {
                 className={`tile ${tileClass}`}
                 onClick={() => handleTileClick(index)}
               >
-                <img src={`/images/${tile}.png`} alt={tile} className="tile-image" />
+                <img src={`${process.env.PUBLIC_URL}/images/${tile}.png`} alt={tile} className="tile-image" />
               </div>
             );
           })}

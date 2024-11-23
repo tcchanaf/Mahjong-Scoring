@@ -1,11 +1,17 @@
 import React from 'react';
-import MainPage from './components/MainPage';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
+import MainPage from './components/MainPage'; 
+
 
 const App = () => {
   return (
-    <div className="app">
-      <MainPage />
-    </div>
+    <Router>
+      <div className="app">
+        <Routes>
+          <Route path="/" element={<MainPage />} /> 
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

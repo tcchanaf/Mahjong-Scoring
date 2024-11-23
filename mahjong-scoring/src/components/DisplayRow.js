@@ -9,7 +9,7 @@ const DisplayRow = ({ tiles, handleTileClick }) => {
             className="tile"
             onClick={() => handleTileClick(tile)} 
           >
-              <img src={`/images/${tile}.png`} alt={tile} className="tile-image" />
+            <img src={`${process.env.PUBLIC_URL}/images/${tile}.png`} alt={tile} className="tile-image" />
           </div>
         ))}
       </div>
