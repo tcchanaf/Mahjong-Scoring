@@ -7,14 +7,14 @@ test('should push "將眼" when tile has last digit 2, 5, or 8', () => {
         [301, 302, 303],
         [101, 102, 103], 
     ];
-    const results = []
+    const results = {}
     pair(closedGroups, results);
-    expect(results.length).toEqual(1);
+    expect("將眼" in results).toEqual(true);
 });
 
 test('門清', () => {
   const openHands = [];
-  const results = []
+  const results = {}
   allClosedHand(openHands, results);
-  expect(results.length).toEqual(1);
+  expect("門清" in results).toEqual(true);
 });

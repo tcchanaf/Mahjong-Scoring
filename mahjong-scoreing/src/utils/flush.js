@@ -1,6 +1,5 @@
 // 單色
-import { getHandCount,isTriplet, isSequence } from '../utils/commonUtils';
-import { patterns } from '../utils/constant';
+import { getHandCount,isTriplet, isSequence, addResult } from '../utils/commonUtils';
 
 
 export function isPureStraight(fullHand) { // 清一色
@@ -14,22 +13,22 @@ export function isMixedStraight(fullHand) { // 混一色
 }
 
 // 般高 
-export function bunGou(closedGroups, openGroups, results) {
+export function bunGou(closedGroups, openGroups, resultDict) {
     const allHandGroups = [...closedGroups, ...openGroups].filter(group => isSequence(group));
     const allHandGroupsCount = getHandCount(allHandGroups);
     for (const group of allHandGroups) {
         if (allHandGroupsCount[group] === 2) {
-            results.push([patterns["一般高"][0], patterns["一般高"][1], group]);
+            addResult(resultDict, "一般高", group);
         } else if (allHandGroupsCount[group] === 3) {
-            results.push([patterns["三般高"][0], patterns["三般高"][1], group]);
+            addResult(resultDict, "三般高", group);
         } else if (allHandGroupsCount[group] === 5) {
-            results.push([patterns["四般高"][0], patterns["四般高"][1], group]);
+            addResult(resultDict, "四般高", group);
         }   
     }
 }
 
 // 姊妹
-export function ziMui(closedGroups, openGroups, pairGroup, results) {
+export function ziMui(closedGroups, openGroups, pairGroup, resultDict) {
     let targetTiles = [];
     const triplets = [...closedGroups, ...openGroups].filter(group => isTriplet(group)).map(group => group[0]);
     const pair = pairGroup[0][0];
@@ -61,15 +60,15 @@ export function ziMui(closedGroups, openGroups, pairGroup, results) {
         }
     }
     if (isLarge) {
-        results.push([patterns["大三姊妹"][0], patterns["大三姊妹"][1], targetTiles])
+        addResult(resultDict, "大三姊妹", targetTiles);
     } else if (isSmall) {
-        results.push([patterns["小三姊妹"][0], patterns["小三姊妹"][1], targetTiles])
+        addResult(resultDict, "小三姊妹", targetTiles);
     }
 }
 
 
 // 清龍
-export function flushDragon(closedGroups, openGroups, results) {
+export function flushDragon(closedGroups, openGroups, resultDict) {
     let targetTiles = [];
     const dragonTiles = new Set([101, 104, 107, 201, 204, 207, 301, 304, 307]);
     const closedDragons = closedGroups.filter(group => isSequence(group) || group[0] in dragonTiles).map(group => group[0]);
@@ -90,9 +89,9 @@ export function flushDragon(closedGroups, openGroups, results) {
         if (fullHandDragonSet.has(second) && fullHandDragonSet.has(third)) {
             targetTiles = [first, first + 1, first + 2, first + 3, first + 4, first + 5, first + 6, first + 7, first + 8];
             if (closedDragonSet.has(first) && closedDragonSet.has(second) && closedDragonSet.has(third)) { // 暗清龍 > 明清龍
-                results.push([patterns["暗清龍"][0], patterns["暗清龍"][1], targetTiles])
+                addResult(resultDict, "暗清龍", targetTiles);
             } else {
-                results.push([patterns["明清龍"][0], patterns["明清龍"][1], targetTiles])
+                addResult(resultDict, "明清龍", targetTiles);
             }
         }
     }

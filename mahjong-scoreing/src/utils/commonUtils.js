@@ -1,3 +1,5 @@
+import { patterns, patternOrder } from "./constant"
+
 // 十三么，十六不搭
 export function isContainSpecialPattern(handCounts, requiredTiles) {    
     for (let tile in requiredTiles) {
@@ -137,4 +139,34 @@ function splitHelper(handCount, groups) {
 }
 
 
+export function addResult(resultDict, faanItem, relatedTiles, faanCount) {
+    if (!relatedTiles) relatedTiles = [];
+    if (!faanCount) faanCount = getFaanCount(faanItem);
 
+    if (faanItem in patterns) {
+        if (!(faanItem in resultDict)) {
+            resultDict[faanItem] = [];
+        }
+        resultDict[faanItem].push([faanItem, faanCount, relatedTiles]);
+    }
+}
+
+export function toResultList(resultDict) {
+    const resultList = [];
+
+    for ( const [patternName, _] of patternOrder){
+        if (patternName in resultDict) {
+            const results = resultDict[patternName];
+            results.forEach(([patternName, count, relatedTiles]) => {
+                resultList.push([patternName, count, relatedTiles]);
+            });
+        }
+    };
+
+    return resultList;
+}
+
+
+function getFaanCount(faanItem) {
+    return patterns[faanItem];
+}

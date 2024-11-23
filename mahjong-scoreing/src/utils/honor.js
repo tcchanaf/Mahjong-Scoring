@@ -1,8 +1,10 @@
 // 字類
 import { tiles } from "./constant"
+import { addResult } from './commonUtils'
 
-//無字 TODO Test case
-export function noHonorTile(fullHandCount,  results) {
+
+//無字
+export function noHonorTile(fullHandCount,  resultDict) {
     let honorTiles = tiles["faanzi"]; //東南西北 中發白
 
     honorTiles.forEach(tile => {
@@ -11,17 +13,17 @@ export function noHonorTile(fullHandCount,  results) {
         }
     });
 
+    addResult(resultDict, "無字");
     return true;
 }
 
 
 // 番子 東南西北 中發白 
-// TODO test case
-export function honorTile(fullHandCount, threeChiefs, fourHappiness, wind, seat, results) {
+export function honorTile(fullHandCount, wind, seat, resultDict) {
     let honorTiles;
-    if (fourHappiness) {
+    if ("小三風" in resultDict || "大三風" in resultDict || "小四喜" in resultDict || "大四喜" in resultDict) {
         honorTiles = tiles["dragons"]; //avoid double count 
-    } else if (threeChiefs) {
+    } else if ("小三元" in resultDict || "大三元" in resultDict) {
         honorTiles = tiles["winds"]; //avoid double count 
     } else {
         honorTiles = tiles["faanzi"]; //東南西北 中發白
@@ -44,13 +46,12 @@ export function honorTile(fullHandCount, threeChiefs, fourHappiness, wind, seat,
     });
 
     if (faanCount > 0) {
-        results.push(["番子", faanCount, []]);
+        addResult(resultDict, "番子", [], faanCount);
     }
 }
 
 //大四喜, 小四喜, 大三風, 小三風
-// TODO test case
-export function fourHappiness(fullHandCount, results) {
+export function fourHappiness(fullHandCount, resultDict) {
     const windTiles = [1, 3, 5, 7]; //東南西北
     let tripletCount = 0;
     let pairCount = 0;
@@ -63,20 +64,21 @@ export function fourHappiness(fullHandCount, results) {
     });
 
     if (tripletCount === 4) {
-        results.push(["大四喜", 80, []]);
+        addResult(resultDict, "大四喜");
     } else if (tripletCount === 3 && pairCount === 1) {
-        results.push(["小四喜", 60, []]);
+        addResult(resultDict, "小四喜");
     } else if (tripletCount === 3) {
-        results.push(["大三風", 30, []]);
+        addResult(resultDict, "大三風");
     } else if (tripletCount === 2 && pairCount === 1) {
-        results.push(["小三風", 15, []]);
+        addResult(resultDict, "小三風");
     }
 
     return tripletCount >= 3 || (tripletCount >= 2 && pairCount === 1);
 }
 
 
-export function threeChiefs(fullHandCount, results) {// 大小三元	
+// 大小三元	
+export function threeChiefs(fullHandCount, resultDict) {
     const dragonTiles = tiles["dragons"]; //中, 發, 白
     
     let tripletCount = 0;
@@ -90,9 +92,9 @@ export function threeChiefs(fullHandCount, results) {// 大小三元
     });
 
     if (tripletCount === 3) {
-        results.push(["大三元", 40, []]);
+        addResult(resultDict, "大三元");
     } else if (tripletCount === 2 && pairCount === 1) {
-        results.push(["小三元", 20, []]);
+        addResult(resultDict, "小三元");
     }
 
     return tripletCount === 3 || (tripletCount === 2 && pairCount === 1);

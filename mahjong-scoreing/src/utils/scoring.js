@@ -1,5 +1,5 @@
 import { patterns } from '../utils/constant';
-import { getHandCount, splitToGroups, isWin, isSequence } from '../utils/commonUtils';
+import { getHandCount, splitToGroups, isWin, isSequence, addResult, toResultList } from '../utils/commonUtils';
 import { thirteenOrphans, sixteenNotMatch, sevenPairs } from '../utils/special';
 import { 
     isPureStraight,
@@ -11,11 +11,14 @@ import {
     honorTile,
     fourHappiness
 } from '../utils/honor';
+import { specialButtons } from '../utils/constant';
 
 
-export function calculateScore(openHand, closedHand, flowers, wind, seat) {
+export function calculateScore(openHand, closedHand, flowers, wind, seat, specialFaans) {
     let fanCount = 0;
-    let results = []; //format: [["faan name", faan count, [related tiles], ...]
+    let resultDict = []; //format: {faanName: [["faanName", faan count, [related tiles],[...]], faanName2: []...}
+
+    handleSpecialFaan(specialFaans, resultDict);
 
     // Combine open and closed hands for total hand evaluation
     const fullHand = [...openHand, ...closedHand];
@@ -29,23 +32,13 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat) {
     const [closedGroups, openGroups, pairGroup] = splitToGroups(closedHandCount, openHandCount);
 
     const isNormalWu = isWin(closedGroups, openGroups);
-    let isThirteenOrphans = false;
-    let isSixteenNotMatch = false;
-    let isSevenPairs = false;
-    if (thirteenOrphans(closedHandCount, results)) {  // 十三么
-        fanCount += 100;
-        isThirteenOrphans = true;
-        results.push(["十三么", 100, [1, 3, 5]]);
-        results.push(["十六么", 100, [11, 13, 15]]);
+    if (thirteenOrphans(closedHandCount, resultDict)) {  // 十三么
+        addResult("十三么", []);
     }
-    else if (sixteenNotMatch(closedHandCount, results)) {// 十六不搭
-        fanCount += 40; 
-        isSixteenNotMatch = true;
+    else if (sixteenNotMatch(closedHandCount, resultDict)) {// 十六不搭
         results.push(["十六不搭", 40, []]);
     }
-    else if (sevenPairs(closedHandCount, results)){ // 嚦咕嚦咕
-        fanCount += 40;
-        isSevenPairs = true;
+    else if (sevenPairs(closedHandCount, resultDict)){ // 嚦咕嚦咕
         results.push(["嚦咕嚦咕", 40, []]);
     } 
     else if (!isNormalWu) {
@@ -66,7 +59,7 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat) {
     }
 
     if (isNormalWu) {
-        allClosedHand(openHand, results);
+        allClosedHand(openHand, resultDict);
     }
 
     if (isPureStraight(fullHand)) fanCount += 80; // 清一色
@@ -75,22 +68,37 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat) {
     if (isAllTriplets(fullHandCount)) fanCount += 30; // 對對糊
 
     // if (isAllHonors(fullHand)) fanCount += 10; // 字一色
-    const isThreeChiefs = threeChiefs(fullHandCount, results); // 大小三元
-    const isFourHappiness = fourHappiness(fullHandCount, results); // //大四喜, 小四喜, 大三風, 小三風
-    honorTile(fullHandCount, isThreeChiefs, isFourHappiness, wind, seat, results);
+    const isThreeChiefs = threeChiefs(fullHandCount, resultDict); // 大小三元
+    const isFourHappiness = fourHappiness(fullHandCount, resultDict); // //大四喜, 小四喜, 大三風, 小三風
+    honorTile(fullHandCount, wind, seat, resultDict);
     
 
     if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
 
-    
-    // Add more scoring rules here
+    const results = toResultList(resultDict);
 
     return results;
 }
 
+export function handleSpecialFaan(specialFaans, resultDict) {
+    const activeSpecialFaans = specialFaans
+        .map((isActive, index) => (isActive ? specialButtons[index] : null))
+        .filter(item => item !== null);
+    for (const faanItem of activeSpecialFaans) {
+        addResult(resultDict, faanItem);
+    }
+    addResult(resultDict, "叮");
+}
+
+export function getTotalScore(resultList) {
+    const score = resultList.reduce((total, result) => {
+        return total + result[1];
+      }, 0);
+      return score;
+}
 
 // 暗刻
-export function closedTriplets(closedGroups, results) {
+export function closedTriplets(closedGroups, resultDict) {
     const tmpClosedHandGroups = closedGroups.filter(group => group.length > 2);
     let tripletCount = 0;
     const groups = []
@@ -117,18 +125,18 @@ export function closedTriplets(closedGroups, results) {
     }
 
     if (tripletCount === 2) {
-        results.push(["二暗刻", 3, groups])
+        addResult(resultDict, "二暗刻", groups);
     } else if (tripletCount === 3) {
-        results.push(["三暗刻", 10, groups])
+        addResult(resultDict, "三暗刻", groups);
     } else if (tripletCount === 4) {
-        results.push(["四暗刻", 30, groups])
+        addResult(resultDict, "四暗刻", groups);
     } else if (tripletCount === 5) {
-        results.push(["五暗刻", 80, groups])
+        addResult(resultDict, "五暗刻", groups);
     } //TODO 間間糊
 }
 
-
-export function isAllTriplets(fullHandCount) { // 對對糊
+ // 對對糊 //TODO use groups instead of handCount
+export function isAllTriplets(fullHandCount, resultDict) {
     let pairCount = 0;
     let tripletCount = 0;
     for (const tile in fullHandCount) {
@@ -142,7 +150,12 @@ export function isAllTriplets(fullHandCount) { // 對對糊
         }
     }
 
-    return pairCount === 1 && tripletCount === (Object.keys(fullHandCount).length - 1);
+    if (pairCount === 1 && tripletCount === (Object.keys(fullHandCount).length - 1)) {
+        addResult(resultDict, "對對胡");
+        return true;
+    } else {
+        return false;
+    }
 }
 
 

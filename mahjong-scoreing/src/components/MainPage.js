@@ -4,9 +4,10 @@ import SelectBoard from './DisplayBoard';
 import FlowerBoard from './FlowerBoard';
 import DisplayRow from './DisplayRow';
 import ResultBoard from './ResultBoard';
+import SpecialButtonPanel from './SpecialButtonPanel';
 import './MainPage.css';
 import './ResultModal.css';
-import { calculateScore } from '../utils/scoring';
+import { calculateScore, getTotalScore } from '../utils/scoring';
 import { tiles } from "../utils/constant"
 
 
@@ -17,6 +18,7 @@ const MainPage = () => {
   const [isOpenHand, setIsOpenHand] = useState(false);
 
   const [flowerTilesState, setFlowerTilesState] = useState(new Array(8).fill(0));
+  const [speicalButtonState, setSpecialButtonState] = useState(Array(12).fill(0));
 
   const winds = ['東圈', '南圈', '西圈', '北圈'];
   const seats = ['東位', '南位', '西位', '北位'];
@@ -47,7 +49,6 @@ const MainPage = () => {
       setFinalTile(tile);
       setClosedHand((prevClosedHand) => [...prevClosedHand, tile]);
     }
-
   };
 
   // Handle switch change between Open Hand and Closed Hand
@@ -67,7 +68,10 @@ const MainPage = () => {
   const handleReset = ()  => {
     setOpenHand([]);
     setClosedHand([]);
+    setSelectedWind(winds[0]);
+    setSelectedSeat(seats[0]);
     setFlowerTilesState(new Array(8).fill(0));
+    setSpecialButtonState(new Array(12).fill(0));
   }
 
 
@@ -93,28 +97,34 @@ const MainPage = () => {
         newState[index] = newState[index] === 0 ? 1 : 0;
         return newState;
     });
-};
+  };
 
-const handleCalculateScore = () => {
-  const flowers = flowerTilesState
-    .map((value, index) => (value === 1 ? tiles["flowers"][index] : null))
-    .filter(value => value !== null);
+    const handleSpeicalButtonClick = (index) => {
+      const newButtonState = [...speicalButtonState];
+      newButtonState[index] = !newButtonState[index];
+      setSpecialButtonState(newButtonState);
+    };
 
-  const wind = tiles["winds"][winds.indexOf(selectedWind)];
-  const seat = tiles["winds"][seats.indexOf(selectedSeat)];
 
-  const faanResults = calculateScore(openHand, closedHand, flowers, wind, seat);
-  console.log("faanResults", faanResults);
-  const calculatedScore = 0;
-  setScore(calculatedScore);
-  setResults(faanResults);
-  setModalOpen(true);
-};
+  const handleCalculateScore = () => {
+    const flowers = flowerTilesState
+      .map((value, index) => (value === 1 ? tiles["flowers"][index] : null))
+      .filter(value => value !== null);
+
+    const wind = tiles["winds"][winds.indexOf(selectedWind)];
+    const seat = tiles["winds"][seats.indexOf(selectedSeat)];
+
+    const faanResults = calculateScore(openHand, closedHand, flowers, wind, seat, speicalButtonState);
+    const calculatedScore = getTotalScore(faanResults);
+    setScore(calculatedScore);
+    setResults(faanResults);
+    setModalOpen(true);
+  };
 
   return (
     <div className="main-page">
       <div className="header">
-        <h1>台牌數番 App</h1>
+        <h1>台牌數番</h1>
 
 
       </div>
@@ -142,6 +152,13 @@ const handleCalculateScore = () => {
             control={<Switch checked={isOpenHand} onChange={handleSwitchChange} />}
             label={isOpenHand ? '門前' : '暗牌'}
           />
+        </div>
+
+        <div className="select-board-third" >
+        <SpecialButtonPanel 
+          handleButtonClick={handleSpeicalButtonClick}
+          buttonState={speicalButtonState}
+        />
         </div>
 
         <div className="select-board-third">

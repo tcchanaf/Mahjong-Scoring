@@ -68,9 +68,9 @@ test('般高', () => {
         [301, 302, 303],
         [201, 202, 203],
     ];
-    const results = [];
-    bunGou(closedGroups, openGroups, results);
-    expect(results[0][0]).toBe(patterns["三般高"][0]);
+    const resultDict = {};
+    bunGou(closedGroups, openGroups, resultDict);
+    expect("三般高" in resultDict).toBe(true);
 });
 
 test('大三姊妹', () => {
@@ -86,9 +86,9 @@ test('大三姊妹', () => {
     const pairGroups = [
         [104, 104]
     ];
-    const results = [];
-    ziMui(closedGroups, openGroups, pairGroups, results);
-    expect(results[0][0]).toBe(patterns["大三姊妹"][0]);
+    const resultDict = {};
+    ziMui(closedGroups, openGroups, pairGroups, resultDict);
+    expect("大三姊妹" in resultDict).toBe(true);
 });
 
 test('小三姊妹', () => {
@@ -104,9 +104,9 @@ test('小三姊妹', () => {
     const pairGroups = [
         [103, 103]
     ];
-    const results = [];
-    ziMui(closedGroups, openGroups, pairGroups, results);
-    expect(results[0][0]).toBe(patterns["小三姊妹"][0]);
+    const resultDict = {};
+    ziMui(closedGroups, openGroups, pairGroups, resultDict);
+    expect("小三姊妹" in resultDict).toBe(true);
 });
 
 test('明清龍', () => {
@@ -120,8 +120,7 @@ test('明清龍', () => {
         [103, 104, 105], 
     ];
 
-    const results = [];
-    flushDragon(closedGroups, openGroups, results);
-    expect(results[0][0]).toBe(patterns["明清龍"][0]);
-    console.log(results);
+    const resultDict = {};
+    flushDragon(closedGroups, openGroups, resultDict);
+    expect("明清龍" in resultDict).toBe(true);
 });

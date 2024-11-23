@@ -1,7 +1,12 @@
-import { isSequence } from "./commonUtils"
+import { isSequence, addResult } from "./commonUtils"
 
-// 平糊
-export function allSequence(closedGroups, openGroups) {
+// 平胡
+export function allSequence(closedGroups, openGroups, resultDict) {
     const allHandGroups = [...closedGroups, ...openGroups].filter(group => group.length > 2);
-    return allHandGroups.every(group => isSequence(group)) && allHandGroups.length === 5;
+    if(allHandGroups.every(group => isSequence(group)) && allHandGroups.length === 5) {
+        addResult(resultDict, "平胡");
+        return true;
+    } else {
+        return false;
+    }
 }

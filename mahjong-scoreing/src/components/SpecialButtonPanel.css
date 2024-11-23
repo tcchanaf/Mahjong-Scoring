@@ -1,0 +1,37 @@
+.special-button-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.special-button {
+  padding: 5px;
+  font-size: 10px;
+  border-radius: 5px;
+  height: 40px;
+  min-width: 45px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.special-button.on {
+  background-color: #695e5c;
+  color: white;
+}
+
+.special-button.off {
+  background-color: #bfc5bf;
+  color: white;
+}
+
+.special-button:focus {
+  outline: none;
+}

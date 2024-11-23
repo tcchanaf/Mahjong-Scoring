@@ -16,8 +16,11 @@ import { getHandCount, splitToGroups, isWin, isSequence } from '../utils/commonU
         203, 203, 203,
         13, 13
         ];
+    const resultDict = {};
     const fullHandCount = getHandCount(hands);
-    expect(isAllTriplets(fullHandCount)).toBe(true);
+    expect(isAllTriplets(fullHandCount, resultDict)).toBe(true);
+    expect("對對胡" in resultDict).toBe(true);
+
   });
 
   test('isAllTriplets should return false for invalid hand', () => {
@@ -28,8 +31,11 @@ import { getHandCount, splitToGroups, isWin, isSequence } from '../utils/commonU
         11, 11, 11,
         203, 204, 205,
         13, 13
-        ]; // Mixed sequences and triplets
-    expect(isAllTriplets(hands)).toBe(false);
+    ]; // Mixed sequences and triplets
+    const resultDict = {};
+    expect(isAllTriplets(hands, resultDict)).toBe(false);
+    expect("對對胡" in resultDict).toBe(false);
+
   });
 
 
@@ -41,9 +47,9 @@ test('暗刻', () => {
         [102, 102, 102],
         [201, 202, 203], 
     ];
-    const results = []
-    closedTriplets(closedGroups, results);
-    expect(results[0][0]).toEqual("三暗刻");
+    const resultDict = {};
+    closedTriplets(closedGroups, resultDict);
+    expect("三暗刻" in resultDict).toBe(true);
 });
 
 test('暗刻 123, 123, 123', () => {
@@ -54,9 +60,9 @@ test('暗刻 123, 123, 123', () => {
         [101, 102, 103], 
         [101, 102, 103], 
     ];
-    const results = []
-    closedTriplets(closedGroups, results);
-    expect(results[0][0]).toEqual("四暗刻");
+    const resultDict = {};
+    closedTriplets(closedGroups, resultDict);
+    expect("四暗刻" in resultDict).toBe(true);
 });
 
 

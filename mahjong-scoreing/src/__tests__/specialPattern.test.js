@@ -95,43 +95,59 @@ describe('Mahjong Hand Validations', () => {
     test('thirteenOrphans should return true for valid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 309, 101, 102, 103, 201]; // with one sequence
         const fullHandCount = getHandCount(hands);
-        expect(thirteenOrphans(fullHandCount)).toBe(true);
+        const resultDict = {};
+        expect(thirteenOrphans(fullHandCount, resultDict)).toBe(true);
+        expect("十三么" in resultDict).toEqual(true);
+
     });
     test('thirteenOrphans should return true for valid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 309, 101, 101, 101, 109]; // with one triplet
         const fullHandCount = getHandCount(hands);
-        expect(thirteenOrphans(fullHandCount)).toBe(true);
+        const resultDict = {};
+        expect(thirteenOrphans(fullHandCount, resultDict)).toBe(true);
+        expect("十三么" in resultDict).toEqual(true);
     });
 
     test('thirteenOrphans should return false for invalid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 109, 201, 209, 301, 308, 1, 1, 1, 3]; // Invalid, not enough Orphan tiles
         const fullHandCount = getHandCount(hands);
-        expect(thirteenOrphans(fullHandCount)).toBe(false);
+        const resultDict = {};
+        expect(thirteenOrphans(fullHandCount, resultDict)).toBe(false);
+        expect("十三么" in resultDict).toEqual(false);
     });
 
     // Test for "十六不搭"
     test('sixteenNotMatch should return true for valid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 104, 107, 201, 204, 207, 301, 304, 307, 1];
         const fullHandCount = getHandCount(hands);
-        expect(sixteenNotMatch(fullHandCount)).toBe(true);
+        const resultDict = {};
+        expect(sixteenNotMatch(fullHandCount, resultDict)).toBe(true);
+        expect("十六不搭" in resultDict).toEqual(true);
     });
 
     test('sixteenNotMatch should return false for invalid hand', () => {
         const hands = [1, 3, 5, 7, 11, 13, 15, 101, 104, 107, 201, 204, 207, 301, 304, 304, 1]; // Contains mismatched sequence
         const fullHandCount = getHandCount(hands);
-        expect(sixteenNotMatch(fullHandCount)).toBe(false);
+        const resultDict = {};
+        expect(sixteenNotMatch(fullHandCount, resultDict)).toBe(false);
     });
 
     // Test for "嚦咕嚦咕" (Seven Pairs)
     test('sevenPairs should return true for valid Seven Pairs hand', () => {
         const hands = [101, 101, 201, 201, 301, 301, 1, 1, 3, 3, 5, 5, 11, 11, 13, 13, 13];
         const fullHandCount = getHandCount(hands);
-        expect(sevenPairs(fullHandCount)).toBe(true);
+        const resultDict = {};
+        expect(sevenPairs(fullHandCount, resultDict)).toBe(true);
+        expect("嚦咕嚦咕" in resultDict).toEqual(true);
+
     });
 
     test('sevenPairs should return false for invalid hand', () => {
         const hands = [101, 101, 201, 201, 301, 301, 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 102]; // Missing pair for 7
         const fullHandCount = getHandCount(hands);
-        expect(sevenPairs(fullHandCount)).toBe(false);
+        const resultDict = {};
+        expect(sevenPairs(fullHandCount, resultDict)).toBe(false);
+        expect("嚦咕嚦咕" in resultDict).toEqual(false);
+
     });
 });

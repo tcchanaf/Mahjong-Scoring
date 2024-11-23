@@ -1,7 +1,7 @@
-import { isContainSpecialPattern, isSequence } from './commonUtils'
+import { isContainSpecialPattern, isSequence, addResult } from './commonUtils'
 
 //十六不搭
-export function sixteenNotMatch (closedHandCount) {
+export function sixteenNotMatch (closedHandCount, resultDict) {
     const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
     if (sumOfTiles !== 17) return false;
     const requiredTiles = {
@@ -42,12 +42,13 @@ export function sixteenNotMatch (closedHandCount) {
             return false;
         }
     };
+    addResult(resultDict, "十六不搭");
 
     return true;
 }
 
 //十三么
-export function thirteenOrphans(closedHandCount) {
+export function thirteenOrphans(closedHandCount, resultDict) {
     const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
     if (sumOfTiles !== 17) return false;
 
@@ -86,18 +87,29 @@ export function thirteenOrphans(closedHandCount) {
         }// else if (remainingTiles[tile] === 3) { // 刻子 1119
     });
     if (remainingTiles.length === 1) {
-        return remainingTiles[0] in requiredTiles;
+        if (remainingTiles[0] in requiredTiles) {
+            addResult(resultDict, "十三么");
+            return true;
+        } else {
+            return false;
+        }
     }
     // 123, 234
     remainingTiles.sort((a, b) => a - b);
     if (remainingTiles.length === 3) {
-        return isSequence(remainingTiles);
+        if (isSequence(remainingTiles)) {
+            addResult(resultDict, "十三么");
+
+        } else {
+            return false;
+        }
     }
 
     // 6789, 1239, 4569...
     let tmpTiles = remainingTiles.slice(0, 3);
     if (isSequence(tmpTiles)) {
         if (remainingTiles[3] in requiredTiles) {
+            addResult(resultDict, "十三么");
             return true;
         }
     }
@@ -106,6 +118,7 @@ export function thirteenOrphans(closedHandCount) {
     tmpTiles = remainingTiles.slice(1, 4);
     if (isSequence(tmpTiles)) {
         if (remainingTiles[0] in requiredTiles) {
+            addResult(resultDict, "十三么");
             return true;
         }
     }
@@ -113,11 +126,15 @@ export function thirteenOrphans(closedHandCount) {
     return false;
 }
 
-export function sevenPairs(closedHandCount) { // 嚦咕嚦咕
+export function sevenPairs(closedHandCount, resultDict) { // 嚦咕嚦咕
     const sumOfTiles = Object.values(closedHandCount).reduce((sum, count) => sum + count, 0);
     if (sumOfTiles !== 17) return false;
 
     const counts = Object.values(closedHandCount);
-    return counts.filter(count => count === 2).length === 7 &&
-           counts.filter(count => count === 3).length === 1;
+    if (counts.filter(count => count === 2).length === 7 && counts.filter(count => count === 3).length === 1) {
+        addResult(resultDict, "嚦咕嚦咕");
+        return true;
+    } else {
+        return false;
+    }
 }

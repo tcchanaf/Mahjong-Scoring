@@ -7,7 +7,7 @@ import {
     getHandCount
 } from '../utils/commonUtils';
 
-test('平糊', () => {
+test('平胡', () => {
     const closedGroups = [
         [102, 102], 
         [101, 102, 103], 
@@ -18,8 +18,10 @@ test('平糊', () => {
         [301, 302, 303],
         [201, 202, 203],
     ];
-    
-    expect(allSequence(closedGroups, openGroups)).toBe(true);
+
+    const resultDict = {};
+    expect(allSequence(closedGroups, openGroups, resultDict)).toBe(true);
+    expect("平胡" in resultDict).toBe(true);
 });
 
 test('平糊 false with triplet', () => {
@@ -34,5 +36,7 @@ test('平糊 false with triplet', () => {
         [201, 202, 203],
     ];
     
-    expect(allSequence(closedGroups, openGroups)).toBe(false);
+    const resultDict = {};
+    expect(allSequence(closedGroups, openGroups, resultDict)).toBe(false);
+    expect("平胡" in resultDict).toBe(false);
 });
