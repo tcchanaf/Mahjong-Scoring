@@ -2,8 +2,8 @@
 import { addResult } from '../utils/commonUtils';
 
 // 將眼
-export function pair(closedGroups, resultDict) {
-    for (const group of closedGroups) {
+export function pair(pairGroup, resultDict) {
+    for (const group of pairGroup) {
         if (group.length === 2) {
             if (group[0] < 100) {
                 continue;
@@ -18,7 +18,13 @@ export function pair(closedGroups, resultDict) {
 
 // 門清
 export function allClosedHand(openHand,  resultDict) {
+    if ("十三么" in resultDict || "十六不搭" in resultDict || "嚦咕嚦咕" in resultDict) return;
+
     if (openHand.length === 0) {
-        addResult(resultDict, "門清");
+        if ("自摸" in resultDict) {
+            addResult(resultDict, "門清自摸");
+        } else {
+            addResult(resultDict, "門清");
+        }
     }
 }

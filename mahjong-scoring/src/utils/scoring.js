@@ -2,16 +2,15 @@ import { patterns } from '../utils/constant';
 import { getHandCount, splitToGroups, isWin, isSequence, addResult, toResultList } from '../utils/commonUtils';
 import { thirteenOrphans, sixteenNotMatch, sevenPairs } from '../utils/special';
 import { 
-    isPureStraight,
-    isMixedStraight
+    isPureStraight, isMixedStraight
 } from '../utils/flush';
-import { allClosedHand } from "../utils/wining";
+import { allClosedHand, pair } from "../utils/wining";
 import { 
-    threeChiefs,
-    honorTile,
-    fourHappiness
+    threeChiefs, honorTile, fourHappiness
 } from '../utils/honor';
+import { flowerFaan, noFlowerNoHonor, noFlowerNoHonorAllSequence } from '../utils/flower';
 import { specialButtons } from '../utils/constant';
+import { allSequence } from '../utils/combination';
 
 
 export function calculateScore(openHand, closedHand, flowers, wind, seat, specialFaans) {
@@ -30,6 +29,8 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     fanCount += 5;
 
     const [closedGroups, openGroups, pairGroup] = splitToGroups(closedHandCount, openHandCount);
+
+
 
     const isNormalWu = isWin(closedGroups, openGroups);
     if (thirteenOrphans(closedHandCount, resultDict)) {  // 十三么
@@ -58,20 +59,25 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
         // return [0, []];
     }
 
-    if (isNormalWu) {
-        allClosedHand(openHand, resultDict);
-    }
+    allClosedHand(openHand, resultDict); //門清
+    
 
     if (isPureStraight(fullHand)) fanCount += 80; // 清一色
     else if (isMixedStraight(fullHand)) fanCount += 30; // 混一色
 
     if (isAllTriplets(fullHandCount)) fanCount += 30; // 對對糊
+    allSequence(closedGroups, openGroups, resultDict); //平胡
 
     // if (isAllHonors(fullHand)) fanCount += 10; // 字一色
-    const isThreeChiefs = threeChiefs(fullHandCount, resultDict); // 大小三元
-    const isFourHappiness = fourHappiness(fullHandCount, resultDict); // //大四喜, 小四喜, 大三風, 小三風
-    honorTile(fullHandCount, wind, seat, resultDict);
-    
+    threeChiefs(fullHandCount, resultDict); // 大小三元
+    fourHappiness(fullHandCount, resultDict); // //大四喜, 小四喜, 大三風, 小三風
+    flowerFaan(flowers, seat, resultDict); // 花
+    honorTile(fullHandCount, wind, seat, resultDict); // 番子
+    noFlowerNoHonor(resultDict);  //無字花
+    noFlowerNoHonorAllSequence(resultDict); //無字花大平胡
+
+    pair(pairGroup, resultDict); //將眼
+
 
     if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
 

@@ -84,7 +84,6 @@ export function flushDragon(closedGroups, openGroups, resultDict) {
         if (first % 100 !== 1) continue; // start with 101, 201, 301
         const second = first + 3;
         const third = second + 3;
-        console.log(second, fullHandDragonSet, fullHandDragonSet.has(second) );
 
         if (fullHandDragonSet.has(second) && fullHandDragonSet.has(third)) {
             targetTiles = [first, first + 1, first + 2, first + 3, first + 4, first + 5, first + 6, first + 7, first + 8];
