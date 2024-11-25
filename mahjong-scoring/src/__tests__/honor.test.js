@@ -4,6 +4,7 @@ import {
     honorTile,
     noHonorTile,
 } from '../utils/honor';
+import { isStraight } from '../utils/flush';
 import { getHandCount, toResultList, splitToGroups, isWin, isSequence } from '../utils/commonUtils';
 
 
@@ -153,4 +154,25 @@ test('isJuniorThreeChiefs should return true for valid Junior Three Chiefs hand'
     noHonorTile(fullHandCount, resultDict);
     expect("無字" in resultDict).toEqual(true);
   });
+
+test('字一色 小四喜 番子', () => {
+  const hands = [
+      11, 11, 11,
+      13, 13, 13,
+      1, 1, 1,
+      3, 3, 3,
+      5, 5, 5,
+      7, 7
+  ];
+  const seat = 1; // 東位
+  const wind = 1; //東圈
+  const fullHandCount = getHandCount(hands);
+  const resultDict = {};
+  fourHappiness(fullHandCount, resultDict);
+  expect(isStraight(hands, resultDict)).toBe(true);
+  honorTile(fullHandCount, wind, seat, resultDict);
+  expect("字一色" in resultDict).toBe(true);
+  expect("小四喜" in resultDict).toEqual(true);
+  expect(resultDict["番子"][0][1]).toEqual(4);
+});
   

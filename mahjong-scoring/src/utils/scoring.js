@@ -1,10 +1,13 @@
-import { patterns } from '../utils/constant';
 import { getHandCount, splitToGroups, isWin, isSequence, addResult, toResultList } from '../utils/commonUtils';
 import { thirteenOrphans, sixteenNotMatch, sevenPairs } from '../utils/special';
 import { 
-    isPureStraight, isMixedStraight
+    isStraight, bunGou, ziMui, flushDragon
 } from '../utils/flush';
-import { allClosedHand, pair } from "../utils/wining";
+import { 
+    hingDai, nonFlushDragon,
+} from '../utils/nonFlush';
+
+import { allClosedHand, pair, winingTile } from "../utils/wining";
 import { 
     threeChiefs, honorTile, fourHappiness
 } from '../utils/honor';
@@ -14,8 +17,7 @@ import { allSequence } from '../utils/combination';
 
 
 export function calculateScore(openHand, closedHand, flowers, wind, seat, specialFaans) {
-    let fanCount = 0;
-    let resultDict = []; //format: {faanName: [["faanName", faan count, [related tiles],[...]], faanName2: []...}
+    let resultDict = {}; //format: {faanName: [["faanName", faan count, [related tiles],[...]], faanName2: []...}
 
     handleSpecialFaan(specialFaans, resultDict);
 
@@ -26,49 +28,34 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     const fullHandCount = getHandCount(fullHand);
     const closedHandCount = getHandCount(closedHand);
     const openHandCount = getHandCount(openHand);
-    fanCount += 5;
 
     const [closedGroups, openGroups, pairGroup] = splitToGroups(closedHandCount, openHandCount);
 
 
-
     const isNormalWu = isWin(closedGroups, openGroups);
     if (thirteenOrphans(closedHandCount, resultDict)) {  // 十三么
-        addResult("十三么", []);
+        addResult(addResult, "十三么", []);
     }
     else if (sixteenNotMatch(closedHandCount, resultDict)) {// 十六不搭
-        results.push(["十六不搭", 40, []]);
+        addResult(addResult, "十六不搭", []);
     }
     else if (sevenPairs(closedHandCount, resultDict)){ // 嚦咕嚦咕
-        results.push(["嚦咕嚦咕", 40, []]);
+        addResult(addResult, "嚦咕嚦咕", []);
     } 
     else if (!isNormalWu) {
         return [
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十三么", 100, [1, 3, 5, 7, 11,  13, 15, 101, 109, 201, 209, 301, 309]],
-            ["十六么", 100, []],
-            ["十六么", 100, []],
+            ["詐胡", 0, []],
         ];
-        // return [0, []];
     }
 
     allClosedHand(openHand, resultDict); //門清
     
 
-    if (isPureStraight(fullHand)) fanCount += 80; // 清一色
-    else if (isMixedStraight(fullHand)) fanCount += 30; // 混一色
+    isStraight(fullHand); // 清一色 混一色 字一色
 
-    if (isAllTriplets(fullHandCount)) fanCount += 30; // 對對糊
+    isAllTriplets(fullHandCount); // 對對糊
     allSequence(closedGroups, openGroups, resultDict); //平胡
 
-    // if (isAllHonors(fullHand)) fanCount += 10; // 字一色
     threeChiefs(fullHandCount, resultDict); // 大小三元
     fourHappiness(fullHandCount, resultDict); // //大四喜, 小四喜, 大三風, 小三風
     flowerFaan(flowers, seat, resultDict); // 花
@@ -77,9 +64,15 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     noFlowerNoHonorAllSequence(resultDict); //無字花大平胡
 
     pair(pairGroup, resultDict); //將眼
+    winingTile(closedHand, closedGroups, pairGroup, resultDict); // 對碰 假獨 獨獨
 
+    flushDragon(closedGroups, openGroups, resultDict); //清龍
+    nonFlushDragon(closedGroups, openGroups, resultDict); //雜龍
+    ziMui(closedGroups, openGroups, pairGroup, resultDict); //姊妹
+    hingDai(closedGroups, openGroups, pairGroup, resultDict); //兄弟
+    bunGou(closedGroups, openGroups, resultDict); //般高
 
-    if (isAllTerminals(fullHand)) fanCount += 13; // 清么九
+    isAllTerminals(fullHand); // 清么九
 
     const results = toResultList(resultDict);
 
@@ -93,7 +86,7 @@ export function handleSpecialFaan(specialFaans, resultDict) {
     for (const faanItem of activeSpecialFaans) {
         addResult(resultDict, faanItem);
     }
-    addResult(resultDict, "叮");
+    addResult(resultDict, "底");
 }
 
 export function getTotalScore(resultList) {

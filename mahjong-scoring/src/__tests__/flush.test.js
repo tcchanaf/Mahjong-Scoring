@@ -1,14 +1,10 @@
 import { 
-    isPureStraight,
-    isMixedStraight,
-    bunGou,
-    ziMui,
-    flushDragon
+    isStraight, bunGou, ziMui, flushDragon
 } from '../utils/flush';
 import { patterns } from "../utils/constant"
 import { getHandCount, splitToGroups, isWin, isSequence } from '../utils/commonUtils';
 
-    // Test for "清一色" (Pure Straight)
+// Test for "清一色" (Pure Straight)
 test('isPureStraight should return true for valid Pure Straight hand', () => {
     const hands = [
         101, 102, 103,
@@ -18,7 +14,9 @@ test('isPureStraight should return true for valid Pure Straight hand', () => {
         108, 108, 108,
         102, 102
     ];
-    expect(isPureStraight(hands)).toBe(true);
+    const resultDict = {};
+    expect(isStraight(hands, resultDict)).toBe(true);
+    expect("清一色" in resultDict).toBe(true);
 });
 
 test('isPureStraight should return false for invalid hand', () => {
@@ -30,20 +28,24 @@ test('isPureStraight should return false for invalid hand', () => {
         108, 108, 108,
         11, 11
     ]; // Mixed with honors
-    expect(isPureStraight(hands)).toBe(false);
+    const resultDict = {};
+    expect(isStraight(hands, resultDict)).toBe(true);
+    expect("混一色" in resultDict).toBe(true);
 });
 
 // Test for "混一色" (Mixed Straight)
 test('isMixedStraight should return true for valid Mixed Straight hand', () => {
     const hands = [
+        11, 11, 11,
         101, 102, 103,
         101, 102, 103,
         101, 102, 103,
-        109, 109, 109,
         108, 108, 108,
-        11, 11
+        109, 109
     ];;
-    expect(isMixedStraight(hands)).toBe(true);
+    const resultDict = {};
+    expect(isStraight(hands, resultDict)).toBe(true);
+    expect("混一色" in resultDict).toBe(true);
 });
 
 test('isMixedStraight should return false for invalid hand', () => {
@@ -55,7 +57,9 @@ test('isMixedStraight should return false for invalid hand', () => {
         208, 208, 208,
         102, 102
     ]; // Mixed but missing honor
-    expect(isMixedStraight(hands)).toBe(false);
+    const resultDict = {};
+    expect(isStraight(hands, resultDict)).toBe(false);
+    expect("混一色" in resultDict).toBe(false);
 });
 
 test('般高', () => {

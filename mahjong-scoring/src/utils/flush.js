@@ -2,14 +2,28 @@
 import { getHandCount,isTriplet, isSequence, addResult } from '../utils/commonUtils';
 
 
-export function isPureStraight(fullHand) { // 清一色
+export function isPureStraight(fullHand, resultDict) { // 清一色
     const suit = Math.floor(fullHand[0] / 100) * 100;
     return fullHand.every(tile => Math.floor(tile / 100) * 100 === suit);
 }
 
-export function isMixedStraight(fullHand) { // 混一色
-    const suit = Math.floor(fullHand[0] / 100) * 100;
-    return fullHand.every(tile => Math.floor(tile / 100) * 100 === suit || tile < 100);
+// 混一色 清一色 字一色
+export function isStraight(fullHand, resultDict) { 
+    let tmpFullHand = [...fullHand];
+    tmpFullHand.sort((a, b) => a - b);
+    const suit = Math.floor(tmpFullHand[tmpFullHand.length - 1] / 100) * 100;
+    if (tmpFullHand.every(tile => Math.floor(tile / 100) * 100 === suit && tile > 100)) {
+        addResult(resultDict, "清一色");
+        return true;
+    } else if (tmpFullHand.every(tile => tile < 100)) {
+        addResult(resultDict, "字一色");
+        return true;
+    } else if (tmpFullHand.every(tile => Math.floor(tile / 100) * 100 === suit || tile < 100)) {
+        addResult(resultDict, "混一色");
+        return true;
+    } 
+
+    return false;
 }
 
 // 般高 
@@ -71,9 +85,9 @@ export function ziMui(closedGroups, openGroups, pairGroup, resultDict) {
 export function flushDragon(closedGroups, openGroups, resultDict) {
     let targetTiles = [];
     const dragonTiles = new Set([101, 104, 107, 201, 204, 207, 301, 304, 307]);
-    const closedDragons = closedGroups.filter(group => isSequence(group) || group[0] in dragonTiles).map(group => group[0]);
+    const closedDragons = closedGroups.filter(group => isSequence(group) && dragonTiles.has(group[0])).map(group => group[0]);
     const closedDragonSet = new Set(closedDragons);
-    const openDragons = openGroups.filter(group => isSequence(group) || group[0] in dragonTiles).map(group => group[0]);
+    const openDragons = openGroups.filter(group => isSequence(group) && dragonTiles.has(group[0])).map(group => group[0]);
 
     const fullHandDragons = [...closedDragons, ...openDragons];
     const fullHandDragonSet = new Set(fullHandDragons);
@@ -94,5 +108,4 @@ export function flushDragon(closedGroups, openGroups, resultDict) {
             }
         }
     }
-
 }

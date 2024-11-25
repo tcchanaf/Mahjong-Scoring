@@ -44,6 +44,7 @@ export function fromHandCountToList(handCount) {
 }
 
 
+//TODO openGroup split by order, split prioirity (tripket > sequence)
 export function splitToGroups(closedHandCount, openHandCount) {
     const closedGroups = [];
     const openGroups = [];
