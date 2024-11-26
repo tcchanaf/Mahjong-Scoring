@@ -1,5 +1,5 @@
 import { 
-    isStraight, bunGou, ziMui, flushDragon
+    isStraight, bunGou, ziMui, flushDragon, tileHog
 } from '../utils/flush';
 import { patterns } from "../utils/constant"
 import { getHandCount, splitToGroups, isWin, isSequence } from '../utils/commonUtils';
@@ -128,3 +128,54 @@ test('明清龍', () => {
     flushDragon(closedGroups, openGroups, resultDict);
     expect("明清龍" in resultDict).toBe(true);
 });
+
+test('四歸一四歸二四歸四', () => {
+    const closedGroups = [
+        [305, 305, 305],
+        [305, 306, 307], 
+    ];
+    const openGroups = [
+        [306, 307, 308],
+        [307, 308, 309],
+        [307, 308, 309],
+    ];
+    const pairGroups = [
+        [306, 306]
+    ];
+
+    const fullHandCount = getHandCount([...closedGroups.flat(), ...openGroups.flat(), ...pairGroups.flat()]);
+    const resultDict = {};
+    tileHog(fullHandCount, closedGroups, openGroups, pairGroups, resultDict);
+
+    expect("四歸一" in resultDict).toBe(true);
+    expect(resultDict["四歸一"][0][2][0]).toBe(305);
+
+    expect("四歸二" in resultDict).toBe(true);
+    expect(resultDict["四歸二"][0][2][0]).toBe(306);
+
+    expect("四歸四" in resultDict).toBe(true);
+    expect(resultDict["四歸四"][0][2][0]).toBe(307);
+});
+
+test('四歸一四歸二四歸四', () => {
+    const closedGroups = [
+        [305, 306, 307], 
+        [305, 306, 307], 
+    ];
+    const openGroups = [
+        [305, 306, 307], 
+        [305, 306, 307], 
+        [101, 102, 103],
+    ];
+    const pairGroups = [
+        [1, 1]
+    ];
+
+    const fullHandCount = getHandCount([...closedGroups.flat(), ...openGroups.flat(), ...pairGroups.flat()]);
+    const resultDict = {};
+    tileHog(fullHandCount, closedGroups, openGroups, pairGroups, resultDict);
+
+    expect("四歸四" in resultDict).toBe(true);
+    expect(resultDict["四歸四"].length).toBe(3);
+});
+

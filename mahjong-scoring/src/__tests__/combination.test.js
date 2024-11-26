@@ -1,5 +1,5 @@
 import { 
-    allSequence, lackOneSuit
+    allSequence, twoFiveSevenSuit
 } from '../utils/combination';
 import { honorTile } from "../utils/honor";
 import { 
@@ -55,7 +55,40 @@ test('缺一門', () => {
     const resultDict = {};
     honorTile(fullHandCount, 1, 1, resultDict);
     expect("無字" in resultDict).toBe(true);
-    expect(lackOneSuit(fullHandCount, resultDict)).toBe(true);
+    twoFiveSevenSuit(fullHandCount, [], resultDict);
     expect("缺一門" in resultDict).toBe(true);
     expect("無字" in resultDict).toBe(false);
+});
+
+
+test('五門齊', () => {
+    const hands = [
+        101, 101, 101,
+        201, 201, 201,
+        201, 202, 203, 
+        301, 302, 303,
+        1, 1, 1,
+        11, 11
+    ];
+    const flowers = [21, 23];
+    const fullHandCount = getHandCount(hands);
+    const resultDict = {};
+    twoFiveSevenSuit(fullHandCount, flowers, resultDict);
+    expect("五門齊" in resultDict).toBe(true);
+});
+
+test('七門齊', () => {
+    const hands = [
+        101, 101, 101,
+        201, 201, 201,
+        201, 202, 203, 
+        301, 302, 303,
+        1, 1, 1,
+        11, 11
+    ];
+    const flowers = [21, 23, 31];
+    const fullHandCount = getHandCount(hands);
+    const resultDict = {};
+    twoFiveSevenSuit(fullHandCount, flowers, resultDict);
+    expect("七門齊" in resultDict).toBe(true);
 });

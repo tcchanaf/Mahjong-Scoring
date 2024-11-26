@@ -29,7 +29,7 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     const closedHandCount = getHandCount(closedHand);
     const openHandCount = getHandCount(openHand);
 
-    const [closedGroups, openGroups, pairGroup] = splitToGroups(closedHandCount, openHandCount);
+    const [closedGroups, openGroups, pairGroups] = splitToGroups(closedHandCount, openHandCount);
 
 
     const isNormalWu = isWin(closedGroups, openGroups);
@@ -63,14 +63,19 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     noFlowerNoHonor(resultDict);  //無字花
     noFlowerNoHonorAllSequence(resultDict); //無字花大平胡
 
-    pair(pairGroup, resultDict); //將眼
-    winingTile(closedHand, closedGroups, pairGroup, resultDict); // 對碰 假獨 獨獨
+    pair(pairGroups, resultDict); //將眼
+    winingTile(closedHand, closedGroups, pairGroups, resultDict); // 對碰 假獨 獨獨
 
     flushDragon(closedGroups, openGroups, resultDict); //清龍
     nonFlushDragon(closedGroups, openGroups, resultDict); //雜龍
-    ziMui(closedGroups, openGroups, pairGroup, resultDict); //姊妹
-    hingDai(closedGroups, openGroups, pairGroup, resultDict); //兄弟
+    ziMui(closedGroups, openGroups, pairGroups, resultDict); //姊妹
+    hingDai(closedGroups, openGroups, pairGroups, resultDict); //兄弟
     bunGou(closedGroups, openGroups, resultDict); //般高
+
+    twoFiveSevenSuit(fullHandCount, flowers, resultDict); //缺一門 七門齊 五門齊
+    tileHog(fullHandCount, closedGroups, openGroups, pairGroups, resultDict);  //四歸一 四歸二 四歸四
+
+
 
     isAllTerminals(fullHand); // 清么九
 

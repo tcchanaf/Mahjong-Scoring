@@ -109,3 +109,25 @@ export function flushDragon(closedGroups, openGroups, resultDict) {
         }
     }
 }
+
+//四歸一 四歸二 四歸四
+export function tileHog(fullHandCount, closedGroups, openGroups, pairGroups, resultDict) {
+    let targetTiles = [];
+    for (const tile in fullHandCount) {
+        if (fullHandCount[tile] === 4) {
+            targetTiles.push(Number(tile));
+        }
+    }
+
+    const fullGroups = [...closedGroups, ...openGroups, ...pairGroups];
+    for (const targetTile of targetTiles) {
+        const numOfUse = fullGroups.filter(group => group.indexOf(targetTile) !== -1).length;
+        if (numOfUse === 2) {
+            addResult(resultDict, "四歸一", [targetTile]);
+        } else if (numOfUse === 3) {
+            addResult(resultDict, "四歸二", [targetTile]);
+        } else if (numOfUse ===  4) {
+            addResult(resultDict, "四歸四", [targetTile]);
+        }
+    }
+}
