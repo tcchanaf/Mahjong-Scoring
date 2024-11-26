@@ -1,5 +1,5 @@
 // 雜色
-import { getHandCount,isTriplet, isSequence, addResult } from '../utils/commonUtils';
+import { getHandCount,isTriplet, isSequence, addResult, fromLeadingTilesToSequences } from '../utils/commonUtils';
 
 // 兄弟
 export function hingDai(closedGroups, openGroups, pairGroup, resultDict) {
@@ -76,6 +76,35 @@ function nonFlushDragonHelper(suitSet, fullHandDragonDict, closedDragonSet, targ
         }
         if (nonFlushDragonHelper(new Set([...suitSet, suit]), fullHandDragonDict, closedDragonSet, targetNumber + 3, isClosed, targetTiles, resultDict)) {
             return true;
+        }
+    }
+}
+
+
+export function soengFung(closedGroups, openGroups, resultDict) {
+    let fullHandGroups = [...closedGroups, ...openGroups];
+    fullHandGroups = fullHandGroups.filter(group => isSequence(group)).map(group => group[0]);
+    const fullHandDict = {};
+    for (const tile of fullHandGroups) { // key: the number of the first tile(101 -> 1), value: list of first tile of a sequence group
+        const number = Number(tile) % 100;
+        fullHandDict[number] = (fullHandDict[number] || []);
+        fullHandDict[number].push(tile);
+    }
+
+    for (const num in fullHandDict) {
+        const tileSet = new Set(fullHandDict[num]);
+
+        if (tileSet.size < 2) continue;
+        else if (tileSet.size === 2) { //Todo use tile instead of group as key
+            addResult(resultDict, "二相逢", fromLeadingTilesToSequences(Array.from(tileSet)));
+        } else if (tileSet.size === 3) {
+            if (fullHandDict[num].length === 3) {
+                addResult(resultDict, "三相逢", fromLeadingTilesToSequences(Array.from(tileSet)));
+            } else if (fullHandDict[num].length === 4) {
+                addResult(resultDict, "四同順", fromLeadingTilesToSequences(fullHandDict[num]));
+            } else if (fullHandDict[num].length === 5) {
+                addResult(resultDict, "五同順", fromLeadingTilesToSequences(fullHandDict[num]));
+            }
         }
     }
 }

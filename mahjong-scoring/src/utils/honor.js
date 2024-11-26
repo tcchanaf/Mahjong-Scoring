@@ -3,22 +3,7 @@ import { tiles } from "./constant"
 import { addResult } from './commonUtils'
 
 
-//無字
-export function noHonorTile(fullHandCount,  resultDict) {
-    let honorTiles = tiles["faanzi"]; //東南西北 中發白
-
-    honorTiles.forEach(tile => {
-        if (fullHandCount[tile] > 0) {
-            return false;
-        }
-    });
-
-    addResult(resultDict, "無字");
-    return true;
-}
-
-
-// 番子 東南西北 中發白 
+// 番子 東南西北 中發白 無字
 export function honorTile(fullHandCount, wind, seat, resultDict) {
     let honorTiles;
     if ("小三風" in resultDict || "大三風" in resultDict || "小四喜" in resultDict || "大四喜" in resultDict) {
@@ -47,6 +32,8 @@ export function honorTile(fullHandCount, wind, seat, resultDict) {
 
     if (faanCount > 0) {
         addResult(resultDict, "番子", [], faanCount);
+    } else if (faanCount === 0 && honorTiles.length === 7) {
+        addResult(resultDict, "無字");
     }
 }
 

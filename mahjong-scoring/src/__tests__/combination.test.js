@@ -1,7 +1,7 @@
 import { 
-    allSequence,
+    allSequence, lackOneSuit
 } from '../utils/combination';
-
+import { honorTile } from "../utils/honor";
 import { 
     isSequence, 
     getHandCount
@@ -39,4 +39,23 @@ test('平糊 false with triplet', () => {
     const resultDict = {};
     expect(allSequence(closedGroups, openGroups, resultDict)).toBe(false);
     expect("平胡" in resultDict).toBe(false);
+});
+
+
+test('缺一門', () => {
+    const hands = [
+        101, 101, 101,
+        201, 201, 201,
+        201, 202, 203, 
+        101, 102, 103,
+        203, 203, 203,
+        104, 104
+        ];
+    const fullHandCount = getHandCount(hands);
+    const resultDict = {};
+    honorTile(fullHandCount, 1, 1, resultDict);
+    expect("無字" in resultDict).toBe(true);
+    expect(lackOneSuit(fullHandCount, resultDict)).toBe(true);
+    expect("缺一門" in resultDict).toBe(true);
+    expect("無字" in resultDict).toBe(false);
 });

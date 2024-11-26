@@ -2,7 +2,6 @@ import {
     threeChiefs,
     fourHappiness,
     honorTile,
-    noHonorTile,
 } from '../utils/honor';
 import { isStraight } from '../utils/flush';
 import { getHandCount, toResultList, splitToGroups, isWin, isSequence } from '../utils/commonUtils';
@@ -141,17 +140,17 @@ test('isJuniorThreeChiefs should return true for valid Junior Three Chiefs hand'
 
   test('無字', () => {
     const hands = [
-      11, 11, 11,
-      13, 13, 13,
-      1, 1, 1,// 東
-      15, 15, 15,
+      101, 101, 101,
+      103, 103, 103,
+      104, 105, 106,
+      205, 205, 205,
       201, 201, 201,
       301, 301
   ];
 
     const resultDict = {};
     const fullHandCount = getHandCount(hands);
-    noHonorTile(fullHandCount, resultDict);
+    honorTile(fullHandCount, 1, 1, resultDict);
     expect("無字" in resultDict).toEqual(true);
   });
 

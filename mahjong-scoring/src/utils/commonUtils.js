@@ -23,6 +23,15 @@ export function isTriplet(tiles) {
     return tiles[0] === tiles[1] && tiles[1] === tiles[2];
 }
 
+export function fromLeadingTilesToSequences(leadingTiles) {
+    let results = [];
+    for (let tile of leadingTiles) {
+        results.push(tile, tile + 1, tile + 2);
+    }
+
+    return results;
+}
+
 export function getHandCount(handTiles) {
     const handCount = {};
     for (const tile of handTiles) {
