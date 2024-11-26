@@ -1,5 +1,5 @@
 // 單色
-import { getHandCount,isTriplet, isSequence, addResult } from '../utils/commonUtils';
+import { getHandCount,isTriplet, isSequence, addResult, fromLeadingTilesToSequences } from '../utils/commonUtils';
 
 
 export function isPureStraight(fullHand, resultDict) { // 清一色
@@ -28,15 +28,17 @@ export function isStraight(fullHand, resultDict) {
 
 // 般高 
 export function bunGou(closedGroups, openGroups, resultDict) {
-    const allHandGroups = [...closedGroups, ...openGroups].filter(group => isSequence(group));
+    const allHandGroups = [...closedGroups, ...openGroups].filter(group => isSequence(group)).map(group => group[0]);
     const allHandGroupsCount = getHandCount(allHandGroups);
-    for (const group of allHandGroups) {
-        if (allHandGroupsCount[group] === 2) {
-            addResult(resultDict, "一般高", group);
-        } else if (allHandGroupsCount[group] === 3) {
-            addResult(resultDict, "三般高", group);
-        } else if (allHandGroupsCount[group] === 5) {
-            addResult(resultDict, "四般高", group);
+    console.log("allHandGroupsCount", allHandGroupsCount);
+    for (let leadingTile in allHandGroupsCount) {
+        leadingTile = Number(leadingTile);
+        if (allHandGroupsCount[leadingTile] === 2) {
+            addResult(resultDict, "一般高", fromLeadingTilesToSequences([leadingTile, leadingTile]));
+        } else if (allHandGroupsCount[leadingTile] === 3) {
+            addResult(resultDict, "三般高", fromLeadingTilesToSequences([leadingTile, leadingTile, leadingTile]));
+        } else if (allHandGroupsCount[leadingTile] === 4) {
+            addResult(resultDict, "四般高", fromLeadingTilesToSequences([leadingTile, leadingTile, leadingTile, leadingTile]));
         }   
     }
 }

@@ -1,7 +1,7 @@
 import { getHandCount, splitToGroups, isWin, isSequence, addResult, toResultList } from '../utils/commonUtils';
 import { thirteenOrphans, sixteenNotMatch, sevenPairs } from '../utils/special';
 import { 
-    isStraight, bunGou, ziMui, flushDragon
+    isStraight, bunGou, ziMui, flushDragon, tileHog
 } from '../utils/flush';
 import { 
     hingDai, nonFlushDragon,
@@ -13,7 +13,7 @@ import {
 } from '../utils/honor';
 import { flowerFaan, noFlowerNoHonor, noFlowerNoHonorAllSequence } from '../utils/flower';
 import { specialButtons } from '../utils/constant';
-import { allSequence } from '../utils/combination';
+import { allSequence, twoFiveSevenSuit } from '../utils/combination';
 
 
 export function calculateScore(openHand, closedHand, flowers, wind, seat, specialFaans) {
@@ -51,9 +51,9 @@ export function calculateScore(openHand, closedHand, flowers, wind, seat, specia
     allClosedHand(openHand, resultDict); //門清
     
 
-    isStraight(fullHand); // 清一色 混一色 字一色
+    isStraight(fullHand, resultDict); // 清一色 混一色 字一色
 
-    isAllTriplets(fullHandCount); // 對對糊
+    isAllTriplets(fullHandCount, resultDict); // 對對糊
     allSequence(closedGroups, openGroups, resultDict); //平胡
 
     threeChiefs(fullHandCount, resultDict); // 大小三元
